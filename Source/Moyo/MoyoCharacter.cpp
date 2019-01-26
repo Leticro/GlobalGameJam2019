@@ -66,12 +66,42 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AMoyoCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AMoyoCharacter::TouchStopped);
+    
+    // Initialize Cone movement
+    FVector position = GetActorLocation();
+    
+    centerPosition = FVector(1200.0f, 20.0f, 0.0f);
+    radiusLength = (position - centerPosition).Size();
+    speed = 24.0f;
 }
 
 void AMoyoCharacter::MoveRight(float Value)
 {
+    // Restore radius
+    FVector location = GetActorLocation();
+    FVector elevation = FVector(0.0f, 0.0f, location.Z);
+    location.Z = 0.0f;
+    FVector currentRadius = location - centerPosition;
+    
+    currentRadius.Normalize();
+    
+    SetActorLocation(centerPosition + elevation + currentRadius * radiusLength);
+    
+    // Find new movement direction
+    
+    float angle = speed * Value;
+    
+    FVector radius = location - centerPosition;
+    
+    FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
+    
+    FVector tangent = newRadius - radius;
+    tangent.Normalize();
+    
+    float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle/2.0f)));
+    
 	// add movement in that direction
-	AddMovementInput(FVector(0.f,-1.f,0.f), Value);
+	AddMovementInput(-tangent, distance);
 }
 
 void AMoyoCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)

@@ -12,6 +12,10 @@ UCLASS(config=Game)
 class AMoyoCharacter : public ACharacter
 {
 	GENERATED_BODY()
+    
+    FVector centerPosition;
+    float radiusLength;
+    float speed;
 
 public:
 	AMoyoCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
