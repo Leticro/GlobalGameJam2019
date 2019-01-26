@@ -28,6 +28,14 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	class AMoyoPlayerController* MoyoPlayerController;
+
+	virtual void BeginPlay() override;
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+
 protected:
 
 	/** Called for side to side input */
@@ -43,8 +51,34 @@ protected:
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
 
+	void SlingDown();
+	void SlingUp();
+	void SlingUpdateTrajectory(float DeltaTime);
+
 
 	virtual bool CanJumpInternal_Implementation() const override;
+
+	bool LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result);
+
+
+public:
+	UPROPERTY(EditAnywhere)
+	float minSlingRadius = 50.f;
+	UPROPERTY(EditAnywhere)
+	float maxSlingRadius = 200.f;
+	UPROPERTY(EditAnywhere)
+	float minSlingVelocity = 50.f;
+	UPROPERTY(EditAnywhere)
+	float maxSlingVelocity = 200.f;
+
+
+
+protected:
+
+	// Sling Parameters
+	bool bSlingHeld;
+	FVector slingDir;
+	float slingMag;
 
 
 public:
