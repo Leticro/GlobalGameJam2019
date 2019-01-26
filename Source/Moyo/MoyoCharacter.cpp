@@ -21,7 +21,7 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
-	// Don't rotate when the controller rotates.
+	// rotate when the controller rotates.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -29,16 +29,14 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	// Create a camera boom attached to the root (capsule)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->bAbsoluteRotation = true;
 	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->TargetArmLength = 500.f;
 	CameraBoom->SocketOffset = FVector(0.f, 0.f, 75.f);
-	//CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
+	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
 	SideViewCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SideViewCamera"));
 	SideViewCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	SideViewCameraComponent->bUsePawnControlRotation = true; // We don't want the controller rotating the camera
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
@@ -96,7 +94,7 @@ void AMoyoCharacter::Tick(float DeltaTime)
     SetActorLocation(centerPosition + elevation + currentRadius * radiusLength);
     
     // Set Camera Position/Rotation
-    CameraBoom->SetWorldLocation(centerPosition + elevation + currentRadius * (radiusLength + cameraDistance));
+    CameraBoom->SetWorldRotation((-currentRadius).Rotation());
 
 	//UE_LOG(LogTemp, Warning, TEXT("MoyoCharacter: Tick was called"));
 	if (bSlingHeld)
