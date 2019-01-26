@@ -6,10 +6,19 @@
 #include "GameFramework/Character.h"
 #include "MoyoCharacter.generated.h"
 
+class UMoyoCharacterMovementComponent;
+
 UCLASS(config=Game)
 class AMoyoCharacter : public ACharacter
 {
 	GENERATED_BODY()
+
+public:
+	AMoyoCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	// Custom Character Movement Component
+	UMoyoCharacterMovementComponent* MoyoCharMovementComp;
+
 
 	/** Side view camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -33,6 +42,9 @@ protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
+
+
+	virtual bool CanJumpInternal_Implementation() const override;
 
 
 public:

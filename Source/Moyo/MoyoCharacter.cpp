@@ -7,8 +7,16 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-AMoyoCharacter::AMoyoCharacter()
+#include "Moyo/Public/MoyoCharacterMovementComponent.h"
+
+
+AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer) 
+	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(CharacterMovementComponentName))
 {
+	
+	MoyoCharMovementComp = Cast<UMoyoCharacterMovementComponent>(GetMovementComponent());
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -23,8 +31,8 @@ AMoyoCharacter::AMoyoCharacter()
 	CameraBoom->bAbsoluteRotation = true; // Rotation of the character should not affect rotation of boom
 	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->TargetArmLength = 500.f;
-	CameraBoom->SocketOffset = FVector(0.f,0.f,75.f);
-	CameraBoom->RelativeRotation = FRotator(0.f,180.f,0.f);
+	CameraBoom->SocketOffset = FVector(0.f, 0.f, 75.f);
+	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
 	SideViewCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SideViewCamera"));
@@ -44,6 +52,7 @@ AMoyoCharacter::AMoyoCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -76,3 +85,8 @@ void AMoyoCharacter::TouchStopped(const ETouchIndex::Type FingerIndex, const FVe
 	StopJumping();
 }
 
+bool AMoyoCharacter::CanJumpInternal_Implementation() const
+{
+	return true;
+	//return CanJumpInternal();
+}
