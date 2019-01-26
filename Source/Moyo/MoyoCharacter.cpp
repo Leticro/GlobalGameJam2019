@@ -100,14 +100,16 @@ void AMoyoCharacter::SlingUpdateTrajectory(float DeltaTime)
 	FVector cursorLocation;
 	if (LinePlaneIntersection(actorPos, planeNormal, mousePos, mouseDir, cursorLocation))
 	{
-		FVector slingVec = slingDir - actorPos;
+		FVector slingVec = cursorLocation - actorPos;
 		slingMag = slingVec.Size();
 		slingVec.Normalize();
 		slingDir = slingVec;
 	
 		UWorld* world = GetWorld();
 
-		//DrawDebugCircle(worl )
+		//DrawDebugLine(world, actorPos, )
+		DrawDebugCircle(world, actorPos, minSlingRadius, 32, FColor::Yellow);
+		DrawDebugCircle(world, actorPos, maxSlingRadius, 32, FColor::Yellow);
 		DrawDebugSphere(world, cursorLocation, 5.0f, 12, FColor::Yellow);
 	}
 }
@@ -142,9 +144,10 @@ void AMoyoCharacter::SlingDown()
 void AMoyoCharacter::SlingUp()
 {
 	bSlingHeld = false;
+
 	// Launch player
 	slingDir.X = 0.f;
-	//LaunchCharacter(slingDir * slingMag, false, false);
+	LaunchCharacter(slingDir * slingMag, false, false);
 }
 
 
