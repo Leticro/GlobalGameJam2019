@@ -8,7 +8,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 #include "Moyo/Public/MoyoCharacterMovementComponent.h"
-
+#include "Moyo/Public/MoyoPlayerController.h"
+#include "DrawDebugHelpers.h"
 
 AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer) 
 	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -49,8 +50,74 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
+
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+}
+
+
+void AMoyoCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	MoyoPlayerController = (AMoyoPlayerController*) GetWorld()->GetFirstPlayerController();
+	
+	// Temporary measure to be able to see cursor
+	//FInputModeGameAndUI defaultInputMode;
+	//defaultInputMode.SetHideCursorDuringCapture(false);
+	//MoyoPlayerController->SetInputMode(defaultInputMode);
+
+	bSlingHeld = false;
+    
+    // Initialize Cylinder movement
+    FVector position = GetActorLocation();
+    
+    centerPosition = FVector(1200.0f, 20.0f, 0.0f);
+    radiusLength = (position - centerPosition).Size();
+    speed = 24.0f;
+}
+
+// Called every frame
+void AMoyoCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	//UE_LOG(LogTemp, Warning, TEXT("MoyoCharacter: Tick was called"));
+	if (bSlingHeld)
+	{
+		SlingUpdateTrajectory(DeltaTime);
+	}
+
+}
+
+
+void AMoyoCharacter::SlingUpdateTrajectory(float DeltaTime)
+{
+	FVector planeNormal = -GetControlRotation().RotateVector(FVector(1.0f, 0.f, 0.f));
+
+	FVector actorPos = GetActorLocation();
+
+	FVector mousePos;
+	FVector mouseDir;
+	MoyoPlayerController->DeprojectMousePositionToWorld(mousePos, mouseDir);
+
+	FVector cursorLocation;
+	if (LinePlaneIntersection(actorPos, planeNormal, mousePos, mouseDir, cursorLocation))
+	{
+		FVector slingVec = cursorLocation - actorPos;
+		slingMag = slingVec.Size();
+		slingVec.Normalize();
+		slingDir = slingVec;
+	
+		UWorld* world = GetWorld();
+
+		//DrawDebugLine(world, actorPos, )
+		DrawDebugCircle(world, actorPos, minSlingRadius, 32, FColor::Yellow);
+		DrawDebugCircle(world, actorPos, maxSlingRadius, 32, FColor::Yellow);
+		DrawDebugSphere(world, cursorLocation, 5.0f, 12, FColor::Yellow);
+	}
 }
 
 
@@ -59,20 +126,15 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 
 void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	// set up gameplay key bindings
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
+    PlayerInputComponent->BindAction("Sling", IE_Pressed, this, &AMoyoCharacter::SlingDown);
+    PlayerInputComponent->BindAction("Sling", IE_Released, this, &AMoyoCharacter::SlingUp);
+    
+    PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
 
 	PlayerInputComponent->BindTouch(IE_Pressed, this, &AMoyoCharacter::TouchStarted);
 	PlayerInputComponent->BindTouch(IE_Released, this, &AMoyoCharacter::TouchStopped);
-    
-    // Initialize Cone movement
-    FVector position = GetActorLocation();
-    
-    centerPosition = FVector(1200.0f, 20.0f, 0.0f);
-    radiusLength = (position - centerPosition).Size();
-    speed = 24.0f;
 }
 
 void AMoyoCharacter::MoveRight(float Value)
@@ -104,19 +166,36 @@ void AMoyoCharacter::MoveRight(float Value)
 	AddMovementInput(-tangent, distance);
 }
 
-void AMoyoCharacter::TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location)
+
+void AMoyoCharacter::SlingDown()
 {
-	// jump on any touch
-	Jump();
+	bSlingHeld = true;
 }
 
-void AMoyoCharacter::TouchStopped(const ETouchIndex::Type FingerIndex, const FVector Location)
+void AMoyoCharacter::SlingUp()
 {
-	StopJumping();
+	bSlingHeld = false;
+
+	// Launch player
+	slingDir.X = 0.f;
+	LaunchCharacter(slingDir * slingMag, false, false);
 }
+
 
 bool AMoyoCharacter::CanJumpInternal_Implementation() const
 {
 	return true;
 	//return CanJumpInternal();
+}
+
+bool AMoyoCharacter::LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result)
+{
+	if (FVector::DotProduct(planeNormal, lineDirection) == 0)
+	{
+		return false;
+	}
+
+	float t = (FVector::DotProduct(planeNormal, planePoint) - FVector::DotProduct(planeNormal, linePoint)) / FVector::DotProduct(planeNormal, lineDirection);
+	result = linePoint + lineDirection * t;
+	return true;
 }
