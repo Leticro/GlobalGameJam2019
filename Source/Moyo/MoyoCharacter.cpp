@@ -132,9 +132,6 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
     PlayerInputComponent->BindAction("Sling", IE_Released, this, &AMoyoCharacter::SlingUp);
     
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
-
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AMoyoCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AMoyoCharacter::TouchStopped);
 }
 
 void AMoyoCharacter::MoveRight(float Value)
