@@ -70,6 +70,8 @@ void AMoyoCharacter::BeginPlay()
 	//MoyoPlayerController->SetInputMode(defaultInputMode);
 
 	bSlingHeld = false;
+	defaultGravityScale = MoyoCharMovementComp->GravityScale;
+	gravityScaleTarget = defaultGravityScale;
     
     // Initialize Cylinder movement
     FVector position = GetActorLocation();
@@ -89,6 +91,8 @@ void AMoyoCharacter::Tick(float DeltaTime)
 	{
 		SlingUpdateTrajectory(DeltaTime);
 	}
+
+	GlideUpdate(DeltaTime);
 
 }
 
@@ -120,6 +124,20 @@ void AMoyoCharacter::SlingUpdateTrajectory(float DeltaTime)
 	}
 }
 
+void AMoyoCharacter::GlideUpdate(float DeltaTime)
+{
+	//UKismetMathLibrary::FloatSpringInterp(MoyoCharMovementComp->GravityScale, gravityScaleTarget, hoverSpringState, 100.f, 0.0f, DeltaTime);
+	if (MoyoCharMovementComp->Velocity.Z < 0.f)
+	{
+		MoyoCharMovementComp->GravityScale = gravityScaleTarget;
+	}
+	else
+	{
+		MoyoCharMovementComp->GravityScale = defaultGravityScale;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("GravityScale: %f"), MoyoCharMovementComp->GravityScale);
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -130,7 +148,10 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
     PlayerInputComponent->BindAction("Sling", IE_Pressed, this, &AMoyoCharacter::SlingDown);
     PlayerInputComponent->BindAction("Sling", IE_Released, this, &AMoyoCharacter::SlingUp);
-    
+	PlayerInputComponent->BindAction("Glide", IE_Pressed, this, &AMoyoCharacter::GlideDown);
+	PlayerInputComponent->BindAction("Glide", IE_Released, this, &AMoyoCharacter::GlideUp);
+
+
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
 }
 
@@ -178,6 +199,16 @@ void AMoyoCharacter::SlingUp()
 	LaunchCharacter(slingDir * slingMag, false, false);
 }
 
+
+void AMoyoCharacter::GlideDown()
+{
+	gravityScaleTarget = glideGravityScale;
+}
+
+void AMoyoCharacter::GlideUp()
+{
+	gravityScaleTarget = defaultGravityScale;
+}
 
 bool AMoyoCharacter::CanJumpInternal_Implementation() const
 {
