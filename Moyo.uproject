@@ -3,10 +3,11 @@
 	"EngineAssociation": "4.21",
 	"Category": "",
 	"Description": "",
-	"Plugins": [
+	"Modules": [
 		{
-			"Name": "Paper2D",
-			"Enabled": true
+			"Name": "Moyo",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	]
 }
