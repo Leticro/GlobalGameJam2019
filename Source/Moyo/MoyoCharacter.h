@@ -12,10 +12,6 @@ UCLASS(config=Game)
 class AMoyoCharacter : public ACharacter
 {
 	GENERATED_BODY()
-    
-    FVector centerPosition;
-    float radiusLength;
-    float speed;
 
 public:
 	AMoyoCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
@@ -77,6 +73,12 @@ protected:
 	bool bSlingHeld;
 	FVector slingDir;
 	float slingMag;
+    
+    // Movement Parameters
+    FVector centerPosition;
+    float radiusLength;
+    float speed;
+    float cameraDistance;
 
 
 public:

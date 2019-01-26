@@ -29,16 +29,16 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	// Create a camera boom attached to the root (capsule)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->bAbsoluteRotation = true; // Rotation of the character should not affect rotation of boom
+	CameraBoom->bAbsoluteRotation = true;
 	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->TargetArmLength = 500.f;
 	CameraBoom->SocketOffset = FVector(0.f, 0.f, 75.f);
-	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
+	//CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
 	SideViewCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SideViewCamera"));
 	SideViewCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
-	SideViewCameraComponent->bUsePawnControlRotation = false; // We don't want the controller rotating the camera
+	SideViewCameraComponent->bUsePawnControlRotation = true; // We don't want the controller rotating the camera
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
@@ -71,18 +71,32 @@ void AMoyoCharacter::BeginPlay()
 
 	bSlingHeld = false;
     
-    // Initialize Cylinder movement
+    // Initialize Cylinder movement (TEMP)
     FVector position = GetActorLocation();
     
     centerPosition = FVector(1200.0f, 20.0f, 0.0f);
     radiusLength = (position - centerPosition).Size();
     speed = 24.0f;
+    cameraDistance = 75.0f;
 }
 
 // Called every frame
 void AMoyoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+    
+    // Restore radius
+    FVector location = GetActorLocation();
+    FVector elevation = FVector(0.0f, 0.0f, location.Z);
+    location.Z = 0.0f;
+    FVector currentRadius = location - centerPosition;
+    
+    currentRadius.Normalize();
+    
+    SetActorLocation(centerPosition + elevation + currentRadius * radiusLength);
+    
+    // Set Camera Position/Rotation
+    CameraBoom->SetWorldLocation(centerPosition + elevation + currentRadius * (radiusLength + cameraDistance));
 
 	//UE_LOG(LogTemp, Warning, TEXT("MoyoCharacter: Tick was called"));
 	if (bSlingHeld)
@@ -136,18 +150,9 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 
 void AMoyoCharacter::MoveRight(float Value)
 {
-    // Restore radius
-    FVector location = GetActorLocation();
-    FVector elevation = FVector(0.0f, 0.0f, location.Z);
-    location.Z = 0.0f;
-    FVector currentRadius = location - centerPosition;
-    
-    currentRadius.Normalize();
-    
-    SetActorLocation(centerPosition + elevation + currentRadius * radiusLength);
-    
     // Find new movement direction
     
+    FVector location = GetActorLocation();
     float angle = speed * Value;
     
     FVector radius = location - centerPosition;
