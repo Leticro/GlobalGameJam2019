@@ -11,6 +11,7 @@ AInteractable::AInteractable()
 
 void AInteractable::Interact_Implementation(APlayerController* Controller)
 {
+    UE_LOG(LogTemp, Warning, TEXT("PICKUP"));
     return;
 }
 

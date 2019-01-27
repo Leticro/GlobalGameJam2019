@@ -9,7 +9,7 @@ APickup::APickup()
     ItemID = FName("No ID");
 
     Super::Name = "Item";
-    Super::Action = "pickup";
+    Super::Action = "Pickup";
 }
 
 void APickup::Interact_Implementation(APlayerController* Controller)

@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 
 #include "Interactable.h"
+#include "Pickup.h"
 #include "InventoryItem.h"
 
 AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer) 
@@ -54,7 +55,7 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
     // Create the pickup collection sphere
     CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
     CollectionSphere->SetupAttachment(RootComponent);
-    CollectionSphere->SetSphereRadius(200.f);
+    CollectionSphere->SetSphereRadius(CollectionSphereRadius);
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -155,41 +156,30 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
 	{
 		MoyoCharMovementComp->GravityScale = defaultGravityScale;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("GravityScale: %f"), MoyoCharMovementComp->GravityScale);
 }
 
 
 void AMoyoCharacter::CheckForInteractables()
 {
-    //// Create a LineTrace to check for a hit
-    //FHitResult HitResult;
+    // Get all overlapping Actors and store them in an array
+    TArray<AActor*> CollectedActors;
+    CollectionSphere->GetOverlappingActors(CollectedActors);
 
-    //int32 Range = 500;
-    //FVector StartTrace = FollowCamera->GetComponentLocation();
-    //FVector EndTrace = (FollowCamera->GetForwardVector() * Range) + StartTrace;
+    AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
 
-    //FCollisionQueryParams QueryParams;
-    //QueryParams.AddIgnoredActor(this);
-
-    //AMoyoCharacter* IController = Cast<AMoyoCharacter>(GetController());
-
-    //if(IController)
-    //{
-    //    // Check if something is hit
-    //    if(GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility, QueryParams))
-    //    {
-    //        // Cast the actor to AInteractable
-    //        AInteractable* Interactable = Cast<AInteractable>(HitResult.GetActor());
-    //        // If the cast is successful
-    //        if(Interactable)
-    //        {
-    //            IController->CurrentInteractable = Interactable;
-    //            return;
-    //        }
-    //    }
-
-    //    IController->CurrentInteractable = nullptr;
-    //}
+    // For each collected Actor
+    for(int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+    {
+        // Cast the actor to AInteractable
+        AInteractable* Interactable = Cast<AInteractable>(CollectedActors[iCollected]);
+        // If the cast is successful
+        if(Interactable)
+        {
+            IController->CurrentInteractable = Interactable;
+            return;
+        }
+    }
+    IController->CurrentInteractable = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////

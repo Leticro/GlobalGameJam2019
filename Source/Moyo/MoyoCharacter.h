@@ -35,6 +35,9 @@ public:
     UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
         class USphereComponent* CollectionSphere;
 
+    UPROPERTY(EditAnywhere)
+        float CollectionSphereRadius = 150.0f;
+
 	class AMoyoPlayerController* MoyoPlayerController;
 
 	virtual void BeginPlay() override;
@@ -94,7 +97,7 @@ protected:
 
 	// Hover fields
 	UPROPERTY(EditAnywhere)
-	float glideGravityScale = 1.f;
+	float glideGravityScale = 1.0f;
 	float gravityScaleTarget;
 	float defaultGravityScale;
 	FFloatSpringState hoverSpringState;
