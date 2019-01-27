@@ -217,7 +217,7 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
         {
             case EMoyoMotorState::CYLINDER:
             {
-                float angle = dir * 20.0f * (180.f / (motor->cylinderRadius * 3.14159265f));
+                float angle = dir * 10.0f * (180.f / (motor->cylinderRadius * 3.14159265f));
                 FVector relativePos = FQuat(FVector(0.f, 0.f, 1.0f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - motor->cylinderFocus);
                 SetActorLocation(motor->cylinderFocus + relativePos);
                 
