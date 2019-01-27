@@ -101,10 +101,12 @@ void AMoyoCharacter::Tick(float DeltaTime)
 	//UE_LOG(LogTemp, Warning, TEXT("MoyoCharacter: Tick was called"));
 	if (bSlingHeld)
 	{
-		SlingUpdateTrajectory(DeltaTime);
+		//Disabled for now 
+		//SlingUpdateTrajectory(DeltaTime);
 	}
 
 	GlideUpdate(DeltaTime);
+
 
 }
 
@@ -151,6 +153,16 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
 }
 
 
+void AMoyoCharacter::DashUpdate(float DeltaTime)
+{
+
+
+
+
+	
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -162,9 +174,11 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
     PlayerInputComponent->BindAction("Sling", IE_Released, this, &AMoyoCharacter::SlingUp);
 	PlayerInputComponent->BindAction("Glide", IE_Pressed, this, &AMoyoCharacter::GlideDown);
 	PlayerInputComponent->BindAction("Glide", IE_Released, this, &AMoyoCharacter::GlideUp);
-
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AMoyoCharacter::DashDown);
+	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AMoyoCharacter::DashUp);
 
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
+
 }
 
 void AMoyoCharacter::MoveRight(float Value)
@@ -211,6 +225,16 @@ void AMoyoCharacter::GlideDown()
 void AMoyoCharacter::GlideUp()
 {
 	gravityScaleTarget = defaultGravityScale;
+}
+
+void AMoyoCharacter::DashDown()
+{
+	
+}
+
+void AMoyoCharacter::DashUp()
+{
+
 }
 
 bool AMoyoCharacter::CanJumpInternal_Implementation() const
