@@ -18,8 +18,12 @@ void UMoyoMotor::BeginPlay()
     
     // Hardcode to "Start to Island01"
 	isCylinder = false;
-    lineStartPoint = FVector(4200.0f, 1120.0f, 0.0f);
-    lineEndPoint = FVector(-20.0f, 1120.0f, 0.0f);
+    //lineStartPoint = FVector(4200.0f, 1120.0f, 0.0f);
+    //lineEndPoint = FVector(-20.0f, 1120.0f, 0.0f);
+    
+    lineStartPoint = FVector(4800.0f, -3600.0f, 0.0f);
+    lineEndPoint = FVector(-3600.0f, -2800.0f, 0.0f);
+    
     lineDirection = lineEndPoint - lineStartPoint;
     lineDirection.Z = 0.0f;
     lineDirection.Normalize();

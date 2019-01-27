@@ -100,7 +100,7 @@ void AMoyoCharacter::BeginPlay()
     //SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
     
     // Island 02 to Island 03
-    //SetLine(FVector(4500.0f, -3380.0f, 0.0f), FVector(-3200.0f, -2600.0f, 0.0f));
+    //SetLine(FVector(4800.0f, -3600.0f, 0.0f), FVector(-3600.0f, -2800.0f, 0.0f));
     
     // Island 03
     //SetCylinder(FVector(4500.0f, -4500.0f, 0.0f), 1120.0f);
