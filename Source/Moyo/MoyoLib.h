@@ -2,21 +2,16 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
 #include "Moyo.h"
-#include "MoyoTypes.h"
 #include "GameFramework/GameModeBase.h"
-#include "MoyoGameMode.generated.h"
+#include "Kismet/BlueprintFunctionLibrary.h"
+#include "MoyoLib.generated.h"
 
 UCLASS()
-class AMoyoGameMode : public AGameModeBase
+class UMoyoLib : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 public:
-	AMoyoGameMode();
-
+	static FVector VectorFromRadians();
 };
-
-
-

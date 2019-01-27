@@ -1,6 +1,8 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 #include "MoyoCharacter.h"
+#include "Moyo.h"
+#include "MoyoMotor.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -26,6 +28,9 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
+
+
+	motor = CreateDefaultSubobject<UMoyoMotor>(TEXT("motor"));
 
 	// Create a camera boom attached to the root (capsule)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -63,6 +68,8 @@ void AMoyoCharacter::BeginPlay()
 
 	MoyoPlayerController = (AMoyoPlayerController*) GetWorld()->GetFirstPlayerController();
 	
+
+
 	// Temporary measure to be able to see cursor
 	//FInputModeGameAndUI defaultInputMode;
 	//defaultInputMode.SetHideCursorDuringCapture(false);
@@ -81,8 +88,6 @@ void AMoyoCharacter::BeginPlay()
     // Start to Island 01
     //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
     
-    // Island 01
-    //SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
     
     // Island 01 to Island 02
     //SetLine(FVector(-792.0f, 792.0f, 0.0f), FVector(-4200.0f, -3000.0f, 0.0f));
@@ -91,7 +96,7 @@ void AMoyoCharacter::BeginPlay()
     //SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
     
     // Island 02 to Island 03
-    SetLine(FVector(4500.0f, -3380.0f, 0.0f), FVector(-3200.0f, -2600.0f, 0.0f));
+    //SetLine(FVector(4500.0f, -3380.0f, 0.0f), FVector(-3200.0f, -2600.0f, 0.0f));
     
     // Island 03
     //SetCylinder(FVector(4500.0f, -4500.0f, 0.0f), 1120.0f);
@@ -112,13 +117,18 @@ void AMoyoCharacter::Tick(float DeltaTime)
     FVector location = GetActorLocation();
     FVector elevation = FVector(0.0f, 0.0f, location.Z);
     location.Z = 0.0f;
-    
-    if(isCylinder) { // --- Cylinder
-        
+	if (!CameraBoom)
+	{
+		return;
+
+	}
+    if(motor->isCylinder) { // --- Cylinder
+
+		CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
         // Character Position
-        FVector currentRadius = location - cylinderFocus;
+        FVector currentRadius = location - motor->cylinderFocus;
         currentRadius.Normalize();
-        SetActorLocation(cylinderFocus + elevation + currentRadius * cylinderRadius);
+        SetActorLocation(motor->cylinderFocus + elevation + currentRadius * motor->cylinderRadius);
         
         // Camera Position/Rotation
         //currentRadius.Z = 0.8f;
@@ -127,12 +137,14 @@ void AMoyoCharacter::Tick(float DeltaTime)
         
     }else{ // --- Line
         // This should not happen often, so it's ok if we value speed over accuracy
+
+		CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
+
+        FVector sToP = location - motor->lineStartPoint;
+        FVector newLocation = motor->lineDirection * sToP.Size();
+        SetActorLocation(motor->lineStartPoint + elevation + newLocation);
         
-        FVector sToP = location - lineStartPoint;
-        FVector newLocation = lineDirection * sToP.Size();
-        SetActorLocation(lineStartPoint + elevation + newLocation);
-        
-        FVector cameraDir = FVector::CrossProduct(lineDirection, FVector(0.0f, 0.0f, 1.0f));
+        FVector cameraDir = FVector::CrossProduct(motor->lineDirection, FVector(0.0f, 0.0f, 1.0f));
         
         CameraBoom->SetWorldRotation((-cameraDir).Rotation());
     }
@@ -217,11 +229,11 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 			//float value = (dashVel * dashDirection) / speed;
 			//UE_LOG(LogTemp, Warning, TEXT("dashVel: %f, dashDir: %f, speed: %f, value: %f"), dashVel, dashDirection, speed, value);
 			
-			if (isCylinder)
+			if (motor->isCylinder)
 			{
-				float angle = -dashPosDelta * (180.f / (cylinderRadius * 3.14159265f));
-				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - cylinderFocus);
-				SetActorLocation(cylinderFocus + relativePos);
+				float angle = -dashPosDelta * (180.f / (motor->cylinderRadius * 3.14159265f));
+				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - motor->cylinderFocus);
+				SetActorLocation(motor->cylinderFocus + relativePos);
 
 				// Just so we "Run" and face the dash direction
 				MoveRightCylinder(dashDirection);
@@ -265,25 +277,6 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 
 }
 
-void AMoyoCharacter::SetCylinder(FVector center, float radius) {
-    isCylinder = true;
-    
-    cylinderFocus = center;
-    cylinderRadius = radius;
-    CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
-}
-
-void AMoyoCharacter::SetLine(FVector start, FVector end) {
-    isCylinder = false;
-    
-    lineStartPoint = start;
-    lineEndPoint = end;
-    lineDirection = lineEndPoint - lineStartPoint;
-    lineDirection.Z = 0.0f;
-    lineDirection.Normalize();
-    CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
-}
-
 
 
 void AMoyoCharacter::MoveRight(float Value)
@@ -291,7 +284,7 @@ void AMoyoCharacter::MoveRight(float Value)
 	if (Value != 0)
 		inputDir = Value;
     
-    if(isCylinder) { // --- Cylinder
+    if(motor->isCylinder) { // --- Cylinder
 		MoveRightCylinder(Value);
     
 	}else{ // --- Line
@@ -308,7 +301,7 @@ void AMoyoCharacter::MoveRightCylinder(float Value)
 
 	float angle = speed * Value;
 
-	FVector radius = location - cylinderFocus;
+	FVector radius = location - motor->cylinderFocus;
 	FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
 
 	FVector tangent = newRadius - radius;
@@ -325,7 +318,7 @@ void AMoyoCharacter::MoveRightCylinder(float Value)
 void AMoyoCharacter::MoveRightLinear(float Value)
 {
 	// add movement in the direction
-	AddMovementInput(-lineDirection, speed * Value);
+	AddMovementInput(-motor->lineDirection, speed * Value);
 }
 
 

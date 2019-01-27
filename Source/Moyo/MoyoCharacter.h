@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Moyo.h"
+#include "MoyoTypes.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
-
 #include "MoyoCharacter.generated.h"
 
 class UMoyoCharacterMovementComponent;
+class UMoyoMotor;
 
 UCLASS(config=Game)
 class AMoyoCharacter : public ACharacter
@@ -88,7 +89,11 @@ public:
 		float dashCurveExponent = 1.0f;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMoyoMotor* motor;
+
 protected:
+
 
 	// Sling fields
 	bool bSlingHeld;
@@ -96,19 +101,8 @@ protected:
 	float slingMag;
 
     // Movement Parameters
-    bool isCylinder;
     float speed;
 		float inputDir;
-
-    // Cylinder
-    FVector cylinderFocus;
-    float cylinderRadius;
-
-    // Line
-    FVector lineStartPoint;
-    FVector lineEndPoint;
-    FVector lineDirection;
-
 	// Hover fields
 	UPROPERTY(EditAnywhere)
 	float glideGravityScale = 1.f;
@@ -126,11 +120,7 @@ protected:
 public:
 	AMoyoCharacter();
 
-    // Sets Cylindrical Motion
-    void SetCylinder(FVector center, float radius);
-
-    // Sets Linear Motion
-    void SetLine(FVector start, FVector end);
+    
 
 	/** Returns SideViewCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }
