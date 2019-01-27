@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Moyo.h"
+#include "MoyoTypes.h"
 #include "MoyoMotor.generated.h"
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
@@ -27,8 +28,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ClampToCylinder();
 
-	UFUNCTION(BlueprintPure)
-	FVector GetForwardVector(float speed) const;
+	UFUNCTION(BlueprintCallable)
+	FVector GetForwardVector(float speed);
 
 	UFUNCTION(BlueprintPure)
 	float GetForwardScalar(float speed) const;
@@ -36,10 +37,15 @@ public:
 	UPROPERTY()
 	TArray<FMoyoSurface> stack;
 
-	// Movement Parameters
-	UPROPERTY(VisibleAnywhere)
-	bool isCylinder;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float fixedRadius;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EMoyoMotorState motorState;
+
+	// owmer
+	UPROPERTY(VisibleAnywhere)
+	AActor* ownerActor;
 
 	// Cylinder
 	UPROPERTY(VisibleAnywhere)
@@ -56,6 +62,15 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	FVector lineDirection;
 
+	UPROPERTY(VisibleAnywhere)
+	FVector boundDirection;
+
+	UPROPERTY(VisibleAnywhere)
+	FVector lastGoodPosition;
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool isLinearBound;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool onlyOneSurface;

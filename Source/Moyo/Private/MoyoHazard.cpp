@@ -39,5 +39,8 @@ void UMoyoHazard::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 void UMoyoHazard::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AMoyoCharacter* Other = Cast<AMoyoCharacter>(OtherActor);
-	Other->DoDeath();
+	if (Other)
+	{
+		Other->DoDeath();
+	}
 }

@@ -11,7 +11,7 @@
 class UMoyoCharacterMovementComponent;
 class UMoyoMotor;
 
-UCLASS(config=Game)
+UCLASS()
 class AMoyoGuy : public ACharacter
 {
 	GENERATED_BODY()
@@ -30,9 +30,20 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 
-protected:
+	UFUNCTION(BlueprintNativeEvent)
+	void DoFallOut();
+	virtual void DoFallOut_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent)
+	void DoDeath();
+	virtual void DoDeath_Implementation();
+
+
+
+public:
 
 	/** Called for side to side input */
+	UFUNCTION()
 	void MoveRight(float Val);
 
 	void MoveRightCylinder(float Val);
@@ -52,8 +63,6 @@ protected:
 	float speed;
 	UPROPERTY()
 	float inputDir;
-	UPROPERTY()
-	float defaultGravityScale;
 
 
 public:

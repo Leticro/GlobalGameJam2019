@@ -19,18 +19,11 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(CharacterMovementComponentName))
 {
 	
-	MoyoCharMovementComp = Cast<UMoyoCharacterMovementComponent>(GetMovementComponent());
-
-	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-
 	// rotate when the controller rotates.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-
-	motor = CreateDefaultSubobject<UMoyoMotor>(TEXT("motor"));
 
 	// Create a camera boom attached to the root (capsule)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -44,15 +37,6 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	SideViewCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("SideViewCamera"));
 	SideViewCameraComponent->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->GravityScale = 2.f;
-	GetCharacterMovement()->AirControl = 0.80f;
-	GetCharacterMovement()->JumpZVelocity = 1000.f;
-	GetCharacterMovement()->GroundFriction = 3.f;
-	GetCharacterMovement()->MaxWalkSpeed = 600.f;
-	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
 
 	PrimaryActorTick.bCanEverTick = true;
@@ -79,12 +63,34 @@ void AMoyoCharacter::BeginPlay()
 	defaultGravityScale = MoyoCharMovementComp->GravityScale;
 	gravityScaleTarget = defaultGravityScale;
     
-    speed = 24.0f;
-	
-	inputDir = 1.0f;
 	dashDirection = inputDir;
     
 
+	// TEMP - Keeping for reference
+
+	// Start to Island 01
+	//SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
+
+	// Island 01
+	//SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
+
+	// Island 01 to Island 02
+	//SetLine(FVector(-792.0f, 792.0f, 0.0f), FVector(-4200.0f, -3000.0f, 0.0f));
+
+	// Island 02
+	//SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
+
+	// Island 02 to Island 03
+	//SetLine(FVector(4800.0f, -3600.0f, 0.0f), FVector(-3600.0f, -2800.0f, 0.0f));
+
+	// Island 03
+	//SetCylinder(FVector(4500.0f, -4500.0f, 0.0f), 1120.0f);
+
+	// Island 03 to Island 04
+	//SetLine(FVector(3910.0f, -10.0f, 0.0f), FVector(3370.0f, -4380.0f, 0.0f));
+
+	// Island 04
+	//SetCylinder(FVector(4900.0f, 0.0f, 0.0f), 1000.0f);
 }
 
 // Called every frame
@@ -94,36 +100,38 @@ void AMoyoCharacter::Tick(float DeltaTime)
 
     // Correct location if outside rails
     FVector location = GetActorLocation();
-    FVector elevation = FVector(0.0f, 0.0f, location.Z);
     location.Z = 0.0f;
+
+
 	if (!CameraBoom)
 	{
 		return;
 
 	}
-    if(motor->isCylinder) { // --- Cylinder
 
-        // Character Position
-        FVector currentRadius = location - motor->cylinderFocus;
-        currentRadius.Normalize();
-        SetActorLocation(motor->cylinderFocus + elevation + currentRadius * motor->cylinderRadius);
-        
-        // Camera Position/Rotation
-        //currentRadius.Z = -0.1f;
-        //currentRadius.Normalize();
-        CameraBoom->SetWorldRotation((-currentRadius).Rotation());
-        
-    }else{ // --- Line
-        // This should not happen often, so it's ok if we value speed over accuracy
+	switch (motor->motorState)
+	{
+	case EMoyoMotorState::CYLINDER:
+	{
+		// Character Position
+		FVector currentRadius = location - motor->cylinderFocus;
+		currentRadius.Normalize();
+		// Camera Position/Rotation
+		//currentRadius.Z = -0.1f;
+		//currentRadius.Normalize();
+		CameraBoom->SetWorldRotation((-currentRadius).Rotation());
+		break;
+	}
+	case EMoyoMotorState::LINEAR:
+	{
+		FVector cameraDir = FVector::CrossProduct(motor->lineDirection, FVector(0.0f, 0.0f, 1.0f));
 
-        FVector sToP = location - motor->lineStartPoint;
-        FVector newLocation = motor->lineDirection * sToP.Size();
-        SetActorLocation(motor->lineStartPoint + elevation + newLocation);
-        
-        FVector cameraDir = FVector::CrossProduct(motor->lineDirection, FVector(0.0f, 0.0f, 1.0f));
-        
-        CameraBoom->SetWorldRotation((-cameraDir).Rotation());
-    }
+		CameraBoom->SetWorldRotation((-cameraDir).Rotation());
+		break;
+	}
+	default:
+		break;
+	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("MoyoCharacter: Tick was called"));
 	if (bSlingHeld)
@@ -204,7 +212,9 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 			//float value = (dashVel * dashDirection) / speed;
 			//UE_LOG(LogTemp, Warning, TEXT("dashVel: %f, dashDir: %f, speed: %f, value: %f"), dashVel, dashDirection, speed, value);
 			
-			if (motor->isCylinder)
+			switch (motor->motorState)
+			{
+			case EMoyoMotorState::CYLINDER:
 			{
 				float angle = -dashPosDelta * (180.f / (motor->cylinderRadius * 3.14159265f));
 				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - motor->cylinderFocus);
@@ -212,14 +222,18 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 
 				// Just so we "Run" and face the dash direction
 				MoveRightCylinder(dashDirection);
+				break;
 			}
-			else
-			{ 
+			case EMoyoMotorState::LINEAR:
 				// Linear not implemented yet
 
 				// Just so we "Run" and face the dash direction
 				MoveRightLinear(dashDirection);
+				break;
+			default:
+				break;
 			}
+
 			dashPrevPos = dashNextPos;
 		}
 
@@ -248,53 +262,11 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AMoyoCharacter::DashDown);
 	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AMoyoCharacter::DashUp);
 
-    PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
+    PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoGuy::MoveRight);
 
 }
 
 
-
-void AMoyoCharacter::MoveRight(float Value)
-{
-	if (Value != 0)
-		inputDir = Value;
-    
-    if(motor->isCylinder) { // --- Cylinder
-		MoveRightCylinder(Value);
-    
-	}else{ // --- Line
-		MoveRightLinear(Value);
-        
-    }
-}
-
-
-void AMoyoCharacter::MoveRightCylinder(float Value)
-{
-	// Find new movement direction
-	FVector location = GetActorLocation();
-
-	float angle = speed * Value;
-
-	FVector radius = location - motor->cylinderFocus;
-	FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
-
-	FVector tangent = newRadius - radius;
-	tangent.Normalize();
-
-	float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle / 2.0f)));
-
-	// add movement in that direction
-	
-	//UE_LOG(LogTemp, Warning, TEXT("location: %s, dist: %f, tangent: %s"), *location.ToString(), distance, *(-tangent).ToString());
-	AddMovementInput(-tangent, distance);
-}
-
-void AMoyoCharacter::MoveRightLinear(float Value)
-{
-	// add movement in the direction
-	AddMovementInput(-motor->lineDirection, speed * Value);
-}
 
 
 void AMoyoCharacter::SlingDown()

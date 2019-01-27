@@ -14,7 +14,10 @@ UMoyoMotor::UMoyoMotor()
 // Called when the game starts
 void UMoyoMotor::BeginPlay()
 {
+	ownerActor = GetOwner();
+	lastGoodPosition = ownerActor->GetActorLocation();
 	Super::BeginPlay();
+
     
 }
 
@@ -25,28 +28,52 @@ void UMoyoMotor::TickComponent(float DeltaTime, enum ELevelTick TickType, FActor
 }
 
 void UMoyoMotor::ClampToCylinder()
-{
-	if (isCylinder)
+{	
+	switch (motorState)
 	{
-		FVector location = GetOwner()->GetActorLocation();
+	case EMoyoMotorState::CYLINDER:
+	{
+		FVector location = ownerActor->GetActorLocation();
 		const FVector elevation = FVector(0.0f, 0.0f, location.Z);
 		location.Z = 0.0f;
-		FVector currentRadius = location - cylinderFocus;
-		currentRadius.Z = 0.0f;
-		currentRadius.Normalize();
+		FVector currentRay = location - cylinderFocus;
+		currentRay.Z = 0.0f;
+		currentRay.Normalize();
 
-		FVector end = cylinderFocus + elevation + currentRadius * cylinderRadius;
-		GetOwner()->SetActorLocation(end);
-
+		float radius = fixedRadius < 1.0f ? cylinderRadius : fixedRadius;
+		FVector end = cylinderFocus + elevation + currentRay * radius;
+		ownerActor->SetActorLocation(end);
+		break;
+	}
+	case EMoyoMotorState::LINEAR:
+	{
+		if (!isLinearBound)
+		{
+			FVector location = ownerActor->GetActorLocation();
+			FVector elevation = FVector(0.0f, 0.0f, location.Z);
+			location.Z = 0.0f;
+			FVector sToP = location - lineStartPoint;
+			FVector newLocation = lineDirection * sToP.Size();
+			FVector end = lineStartPoint + elevation + newLocation;
+			ownerActor->SetActorLocation(end);
+		}
+		break;
+	}
+	default:
+		break;
 	}
 }
 
-FVector UMoyoMotor::GetForwardVector(float input) const
+FVector UMoyoMotor::GetForwardVector(float input)
 {
-	if (isCylinder)
+	FVector location = ownerActor->GetActorLocation();
+	FVector elevation = FVector(0.0f, 0.0f, location.Z);
+
+	location.Z = 0.0f;
+	switch(motorState)
 	{
-		FVector location = GetOwner()->GetActorLocation();
-		location.Z = 0.0f;
+	case EMoyoMotorState::CYLINDER:
+	{
 		const FVector radius = location - cylinderFocus;
 		const FVector newRadius = radius.RotateAngleAxis(input, FVector(0.0f, 0.0f, 1.0f));
 
@@ -55,20 +82,58 @@ FVector UMoyoMotor::GetForwardVector(float input) const
 		tangent.Normalize();
 		return tangent;
 	}
-	else
-	{
+	case EMoyoMotorState::LINEAR:
+		if (isLinearBound)
+		{
+			const float LineLength = FVector::Dist2D(lineEndPoint, lineStartPoint);
+			const float ToStart = FVector::Dist2D(location, lineStartPoint);
+			const float ToEnd = FVector::Dist2D(location, lineEndPoint);
+			if (ToStart > LineLength)
+			{
+				const FVector mostly = FMath::Lerp(lineEndPoint, lineStartPoint, 0.1f);
+				ownerActor->SetActorLocation(mostly + elevation);
+
+				boundDirection = lineStartPoint - location;
+				boundDirection.Normalize();
+
+				location = ownerActor->GetActorLocation();
+				location.Z = 0.0f;
+				const float ToStart = FVector::Dist2D(location, lineStartPoint);
+				if (ToStart > LineLength)
+				{
+					location = FVector::ZeroVector;
+				}
+			}
+			else if (ToEnd > LineLength)
+			{
+				const FVector mostly = FMath::Lerp(lineStartPoint, lineEndPoint, 0.1f);
+				ownerActor->SetActorLocation(mostly + elevation);
+				boundDirection = lineEndPoint - location;
+				boundDirection.Normalize();
+
+				location = ownerActor->GetActorLocation();
+				location.Z = 0.0f;
+				const float ToEnd = FVector::Dist2D(location, lineEndPoint);
+				if (ToEnd > LineLength)
+				{
+					location = FVector::ZeroVector;
+				}
+			}
+			return boundDirection;
+		}
 		return lineDirection;
+	default:
+		return ownerActor->GetActorForwardVector();
 	}
 }
 
 float UMoyoMotor::GetForwardScalar(float input) const
 {
-	if (isCylinder)
+	switch (motorState)
 	{
+	case EMoyoMotorState::CYLINDER:
 		return 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(input / 2.0f)));
-	}
-	else
-	{
+	default:
 		return input;
 	}
 }
@@ -85,17 +150,23 @@ void UMoyoMotor::AssignSurface(FMoyoSurface surface)
 		return lhs.priority > rhs.priority;
 	});
 
- 	isCylinder = stack[0].isCylinder;
+	motorState = stack[0].motorState;
 
 	cylinderFocus = stack[0].center;
 	cylinderRadius = stack[0].radius;
 	lineStartPoint = stack[0].start;
+	lineStartPoint.Z = 0.0f;
 	lineEndPoint = stack[0].end;
-	if(!isCylinder)
+	lineEndPoint.Z = 0.0f;
+	if(motorState == EMoyoMotorState::LINEAR)
 	{
 		lineDirection = lineEndPoint - lineStartPoint;
-		lineDirection.Z = 0.0f;
 		lineDirection.Normalize();
+		boundDirection = lineDirection;
+	}
+	else if (motorState == EMoyoMotorState::CYLINDER)
+	{
+		lastGoodPosition = GetOwner()->GetActorLocation();
 	}
 	if (onlyOneSurface)
 	{
@@ -117,16 +188,17 @@ void UMoyoMotor::RemoveSurface(FMoyoSurface surface)
 
  	if (stack.Num() > 0)
 	{
-		isCylinder = stack[0].isCylinder;
+		motorState = stack[0].motorState;
 
 		cylinderFocus = stack[0].center;
 		cylinderRadius = stack[0].radius;
 		lineStartPoint = stack[0].start;
+		lineStartPoint.Z = 0.0f;
 		lineEndPoint = stack[0].end;
-		if (!isCylinder)
+		lineEndPoint.Z = 0.0f;
+		if (motorState == EMoyoMotorState::LINEAR)
 		{
 			lineDirection = lineEndPoint - lineStartPoint;
-			lineDirection.Z = 0.0f;
 			lineDirection.Normalize();
 		}
 	}

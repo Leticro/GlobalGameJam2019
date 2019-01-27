@@ -20,7 +20,14 @@ AMoyoVolume::AMoyoVolume(const FObjectInitializer& ObjectInitializer)
 void AMoyoVolume::BeginPlay()
 {
 	surfacedata.priority = priority;
-	surfacedata.isCylinder = cylinderRadius > 1.0f;
+	if (cylinderRadius > 1.0f)
+	{
+		surfacedata.motorState = EMoyoMotorState::CYLINDER;
+	}
+	else
+	{
+		surfacedata.motorState = EMoyoMotorState::LINEAR;
+	}
 	
 	surfacedata.center = collider->GetComponentLocation();
 	surfacedata.center.Z = 0.0f;
@@ -33,11 +40,6 @@ void AMoyoVolume::BeginPlay()
 	GetOverlappingActors(overlaps);
 	for (auto x : overlaps)
 	{
-		UActorComponent* OtherMotorComponent = x->GetComponentByClass(UMoyoMotor::StaticClass());
-		if (OtherMotorComponent)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Initial overlap %s with %s"), *GetName(), *x->GetName());
-		}
 		OnBeginOverlap(this, x);
 	}
 
@@ -47,21 +49,26 @@ void AMoyoVolume::BeginPlay()
 
 void AMoyoVolume::OnBeginOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
 {
-	UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
-	if (OtherMotorComponent)
+	if (OtherActor && acceptedClasses.Contains(OtherActor->GetClass()))
 	{
-		UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
-		OtherMotor->AssignSurface(surfacedata);
+		UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
+		if (OtherMotorComponent)
+		{
+			UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
+			OtherMotor->AssignSurface(surfacedata);
+		}
 	}
 }
 
 void AMoyoVolume::OnEndOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
 {
-
-	UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
-	if (OtherMotorComponent)
+	if (OtherActor && acceptedClasses.Contains(OtherActor->GetClass()))
 	{
-		UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
-		OtherMotor->RemoveSurface(surfacedata);
+		UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
+		if (OtherMotorComponent)
+		{
+			UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
+			OtherMotor->RemoveSurface(surfacedata);
+		}
 	}
 }

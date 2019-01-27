@@ -16,6 +16,15 @@ enum class EMoyoGameState : uint8
 	FINISH
 };
 
+UENUM(BlueprintType)
+enum class EMoyoMotorState : uint8
+{
+	NONE,
+	CYLINDER,
+	LINEAR
+};
+
+
 USTRUCT(BlueprintType)
 struct FMoyoSurface
 {
@@ -24,7 +33,7 @@ struct FMoyoSurface
 	FMoyoSurface()
 	{
 		priority = -1;
-		isCylinder = true;
+		motorState = EMoyoMotorState::CYLINDER;
 		center = FVector::ZeroVector;
 		radius = 1000.0f;
 		start = FVector::ZeroVector;
@@ -35,7 +44,7 @@ struct FMoyoSurface
 		int32 priority;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		bool isCylinder;
+		EMoyoMotorState motorState;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FVector center;

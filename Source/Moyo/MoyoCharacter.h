@@ -4,24 +4,19 @@
 
 #include "Moyo.h"
 #include "MoyoTypes.h"
-#include "GameFramework/Character.h"
+#include "MoyoGuy.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "MoyoCharacter.generated.h"
 
-class UMoyoCharacterMovementComponent;
-class UMoyoMotor;
 
-UCLASS(config=Game)
-class AMoyoCharacter : public ACharacter
+UCLASS()
+class AMoyoCharacter : public AMoyoGuy
 {
 	GENERATED_BODY()
 
 public:
 	AMoyoCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
-	// Custom Character Movement Component
-	UMoyoCharacterMovementComponent* MoyoCharMovementComp;
-
+	
 
 	/** Side view camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -30,9 +25,6 @@ public:
 	/** Camera boom positioning the camera beside the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
-
-	UFUNCTION()
-	void DoDeath() {}
 
 	class AMoyoPlayerController* MoyoPlayerController;
 
@@ -44,11 +36,6 @@ public:
 
 protected:
 
-	/** Called for side to side input */
-	void MoveRight(float Val);
-
-	void MoveRightCylinder(float Val);
-	void MoveRightLinear(float Val);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -92,8 +79,6 @@ public:
 		float dashCurveExponent = 1.0f;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMoyoMotor* motor;
 
 protected:
 
@@ -103,9 +88,6 @@ protected:
 	FVector slingDir;
 	float slingMag;
 
-    // Movement Parameters
-    float speed;
-		float inputDir;
 	// Hover fields
 	UPROPERTY(EditAnywhere)
 	float glideGravityScale = 1.f;

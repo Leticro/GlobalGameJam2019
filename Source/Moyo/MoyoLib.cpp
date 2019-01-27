@@ -5,11 +5,6 @@
 #include "MoyoMotor.h"
 #include "Moyo.h"
 
-FVector UMoyoLib::VectorFromRadians()
-{
-	return FVector::ZeroVector;
-}
-
 FVector UMoyoLib::GetMoveDestination(float DeltaTime, AActor* Actor, float MoveSpeed, UMoyoMotor* Motor)
 {
 	Motor->ClampToCylinder();
