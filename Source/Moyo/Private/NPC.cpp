@@ -4,14 +4,12 @@
 
 ANPC::ANPC()
 {
-    NPCMesh = CreateDefaultSubobject<UStaticMeshComponent>("NPCMesh");
-    RootComponent = Cast<USceneComponent>(NPCMesh);
 
-    Super::Name = "Neighbor";
-    Super::Action = "Talk";
 }
 
-void ANPC::Interact_Implementation(APlayerController* Controller)
+void ANPC::Interact_Implementation(APlayerController* Controller, AMoyoCharacter* Character)
 {
-    Super::Interact_Implementation(Controller);
+    Super::Interact_Implementation(Controller, Character);
+
+
 }

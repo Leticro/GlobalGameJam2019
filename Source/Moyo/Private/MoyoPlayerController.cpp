@@ -3,6 +3,7 @@
 #include "Moyo/Public/MoyoPlayerController.h"
 
 #include "MoyoGameState.h"
+#include "InteractableComponent.h"
 
 /* Started moving input logic into the Player Controller but task is on hold for now
 
@@ -82,6 +83,10 @@ void AMoyoPlayerController::Interact()
     }
     else if(CurrentInteractable)
     {
-        CurrentInteractable->Interact(this);
+        CurrentInteractable->Interact(this, CurrentPawn);
+    }
+    else if(CurrentInteractableComponent)
+    {
+        CurrentInteractableComponent->Interact(this, CurrentPawn);
     }
 }

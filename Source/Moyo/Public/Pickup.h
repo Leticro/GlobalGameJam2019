@@ -2,6 +2,7 @@
 
 #include "Engine.h"
 
+#include "MoyoCharacter.h"
 #include "Interactable.h"
 #include "Pickup.generated.h"
 
@@ -13,7 +14,7 @@ class MOYO_API APickup : public AInteractable
 public:
     APickup();
 
-    void Interact_Implementation(APlayerController* Controller) override;
+    void Interact_Implementation(APlayerController* Controller, AMoyoCharacter* Character) override;
 
 protected:
     UPROPERTY(EditAnywhere)

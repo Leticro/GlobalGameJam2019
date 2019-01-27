@@ -15,6 +15,7 @@
 #include "DrawDebugHelpers.h"
 
 #include "Interactable.h"
+#include "InteractableComponent.h"
 #include "Pickup.h"
 #include "InventoryItem.h"
 
@@ -59,7 +60,7 @@ void AMoyoCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	MoyoPlayerController = (AMoyoPlayerController*) GetWorld()->GetFirstPlayerController();
-	
+    MoyoPlayerController->CurrentPawn = this;
 
 
 	// Temporary measure to be able to see cursor
@@ -280,7 +281,6 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 
 void AMoyoCharacter::CheckForInteractables()
 {
-
     AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
 
     if(IController->Inventory.Num())
@@ -313,9 +313,17 @@ void AMoyoCharacter::CheckForInteractables()
                 IController->CurrentInteractable = Interactable;
                 return;
             }
+            UActorComponent * OtherComponent = CollectedActors[iCollected]->GetComponentByClass(UInteractableComponent::StaticClass());
+            if(OtherComponent)
+            {
+                UInteractableComponent* Other = Cast<UInteractableComponent>(OtherComponent);
+                IController->CurrentInteractableComponent = Other;
+                return;
+            }
         }
     }
     IController->CurrentInteractable = nullptr;
+    IController->CurrentInteractableComponent = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -333,7 +341,6 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AMoyoCharacter::DashUp);
 
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoGuy::MoveRight);
-
 }
 
 
