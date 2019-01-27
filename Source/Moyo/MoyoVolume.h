@@ -42,9 +42,12 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	int32 priority;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float lineLength;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FVector lineStart;
+    
+    UPROPERTY(BlueprintReadWrite, EditAnywhere)
+    FVector lineEnd;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float cylinderRadius;

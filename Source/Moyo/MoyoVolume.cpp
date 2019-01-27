@@ -20,14 +20,14 @@ AMoyoVolume::AMoyoVolume(const FObjectInitializer& ObjectInitializer)
 void AMoyoVolume::BeginPlay()
 {
 	surfacedata.priority = priority;
-	surfacedata.isCylinder = lineLength < 1.0f;
+	surfacedata.isCylinder = cylinderRadius > 1.0f;
 	
 	surfacedata.center = collider->GetComponentLocation();
 	surfacedata.center.Z = 0.0f;
 	surfacedata.radius = cylinderRadius;
 	FTransform t = collider->GetComponentToWorld();
-	surfacedata.start = collider->GetComponentLocation() + lineLength * t.GetRotation().GetUpVector();
-	surfacedata.end = collider->GetComponentLocation() - lineLength * t.GetRotation().GetUpVector();
+	surfacedata.start = lineStart;
+	surfacedata.end = lineEnd;
 
 	OnActorBeginOverlap.AddDynamic(this, &AMoyoVolume::OnBeginOverlap);
 	OnActorEndOverlap.AddDynamic(this, &AMoyoVolume::OnEndOverlap);
@@ -58,8 +58,8 @@ void AMoyoVolume::Debug()
 {
 
 	FTransform t = collider->GetComponentToWorld();
-	FVector a = collider->GetComponentLocation() + lineLength * t.GetRotation().GetUpVector();
-	FVector c = collider->GetComponentLocation() - 2.0f*lineLength * t.GetRotation().GetUpVector();
+	FVector a = lineStart;
+	FVector c = lineEnd;
 	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), a, 3.0f, FColor::Red, true, 3.0f);
 	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), c, 3.0f, FColor::Green, true, 3.0f);
 
