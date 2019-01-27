@@ -217,13 +217,13 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 		else
 		{
 
-			//float EaseInOutCurve = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
-			//float EaseOutCurve = FMath::InterpEaseOut(0.0f, dashDistance, t, dashCurveExponent);
-			//float outerT = FMath::Clamp(t * 4.0f, 0.f, 1.f);
-			//float dashNextPos = FMath::Lerp(EaseInOutCurve, EaseOutCurve, outerT);
+			float EaseInOutCurve = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
+			float EaseOutCurve = FMath::InterpEaseOut(0.0f, dashDistance, t, dashCurveExponent);
+			float outerT = FMath::Clamp(t * 4.0f, 0.f, 1.f);
+			float dashNextPos = FMath::Lerp(EaseInOutCurve, EaseOutCurve, outerT);
 
 
-			float dashNextPos = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
+			//float dashNextPos = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
 			float dashPosDelta = (dashNextPos - dashPrevPos) * dashDirection;
 			//float dashVel = dashPosDelta / DeltaTime;
 			//float value = (dashVel * dashDirection) / speed;
