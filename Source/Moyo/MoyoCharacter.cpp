@@ -37,7 +37,7 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->TargetArmLength = 800.f;
-	CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 140.f);
 	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
@@ -85,9 +85,7 @@ void AMoyoCharacter::BeginPlay()
 	dashDirection = inputDir;
     
     
-    
-    
-    // TEMP
+    // TEMP - Keeping for reference
     
     // Start to Island 01
     //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
@@ -130,21 +128,18 @@ void AMoyoCharacter::Tick(float DeltaTime)
 	}
     if(motor->isCylinder) { // --- Cylinder
 
-		CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
         // Character Position
         FVector currentRadius = location - motor->cylinderFocus;
         currentRadius.Normalize();
         SetActorLocation(motor->cylinderFocus + elevation + currentRadius * motor->cylinderRadius);
         
         // Camera Position/Rotation
-        //currentRadius.Z = 0.8f;
+        //currentRadius.Z = -0.1f;
         //currentRadius.Normalize();
         CameraBoom->SetWorldRotation((-currentRadius).Rotation());
         
     }else{ // --- Line
         // This should not happen often, so it's ok if we value speed over accuracy
-
-		CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
 
         FVector sToP = location - motor->lineStartPoint;
         FVector newLocation = motor->lineDirection * sToP.Size();
