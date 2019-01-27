@@ -2,13 +2,14 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Moyo.h"
+#include "MoyoTypes.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
-
 #include "MoyoCharacter.generated.h"
 
 class UMoyoCharacterMovementComponent;
+class UMoyoMotor;
 
 UCLASS(config=Game)
 class AMoyoCharacter : public ACharacter
@@ -72,6 +73,8 @@ public:
 
 protected:
 
+	UMoyoMotor* motor;
+
 	// Sling fields
 	bool bSlingHeld;
 	FVector slingDir;
@@ -100,6 +103,7 @@ protected:
 
 public:
 	AMoyoCharacter();
+
     
     // Sets Cylindrical Motion
     void SetCylinder(FVector center, float radius);

@@ -1,6 +1,7 @@
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 
 #include "MoyoCharacter.h"
+#include "Moyo.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -88,7 +89,11 @@ void AMoyoCharacter::Tick(float DeltaTime)
     FVector location = GetActorLocation();
     FVector elevation = FVector(0.0f, 0.0f, location.Z);
     location.Z = 0.0f;
-    
+	if (!CameraBoom)
+	{
+		return;
+
+	}
     if(isCylinder) { // --- Cylinder
         
         // Character Position
@@ -179,6 +184,7 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
 }
+
 
 void AMoyoCharacter::SetCylinder(FVector center, float radius) {
     isCylinder = true;
