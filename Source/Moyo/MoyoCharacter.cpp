@@ -260,8 +260,6 @@ void AMoyoCharacter::CheckForInteractables()
         // If the cast is successful
         if(Interactable)
         {
-
-            UE_LOG(LogTemp, Warning, TEXT("%p"), IController);
             IController->CurrentInteractable = Interactable;
             return;
         }
