@@ -75,7 +75,7 @@ void AMoyoCharacter::BeginPlay()
     cameraDistance = 75.0f;
     
     // TEMP
-    SetCylinder(FVector(1200.0f, 20.0f, 0.0f), 500.0f);
+    SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
     //SetLine(FVector(1200.0f, 20.0f, 0.0f), FVector(1800.0f, 50.0f, 0.0f));
 }
 
