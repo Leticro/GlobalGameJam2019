@@ -123,6 +123,15 @@ void AMoyoCharacter::Tick(float DeltaTime)
 
 	}
 
+	if (gravityScaleTarget < 0.9f*defaultGravityScale)
+	{
+		floatRemaining -= DeltaTime;
+		if (floatRemaining < 0)
+		{
+			floatRemaining = 7.5f;
+			DoKeepFloat();
+		}
+	}
 	switch (motor->motorState)
 	{
 	case EMoyoMotorState::CYLINDER:
@@ -194,15 +203,40 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
 	//glideAmount = UKismetMathLibrary::FloatSpringInterp(glideAmount, glideIntention, hoverSpringState, 100.f, 0.5f, DeltaTime);
 	glideAmount = FMath::FInterpTo(glideAmount, glideIntention, DeltaTime, 10.0f);
 
-	if (MoyoCharMovementComp->Velocity.Z < 0.f)
+	if (glideIntention > 0.1f && MoyoCharMovementComp->Velocity.Z < 0.f)
 	{
 		//MoyoCharMovementComp->GravityScale = UKismetMathLibrary::FloatSpringInterp(MoyoCharMovementComp->GravityScale, gravityScaleTarget, hoverSpringState, 100.f, 0.5f, DeltaTime);
 		MoyoCharMovementComp->GravityScale = (defaultGravityScale - glideGravityScale) * (1.0f - glideAmount) + glideGravityScale;
-		
 
-		//glideAmount = 1.0f - (MoyoCharMovementComp->GravityScale - glideGravityScale) / 
-		//MoyoCharMovementComp->GravityScale = FMath::FInterpTo(MoyoCharMovementComp->GravityScale, gravityScaleTarget, DeltaTime, 100.0f);
-		//MoyoCharMovementComp->GravityScale = gravityScaleTarget;
+        float dir = -1.0f;
+        if(inputDir < 0.0f) {
+            dir = 1.0f;
+        }
+        
+        switch (motor->motorState)
+        {
+            case EMoyoMotorState::CYLINDER:
+            {
+                float angle = dir * 10.0f * (180.f / (motor->cylinderRadius * 3.14159265f));
+                FVector relativePos = FQuat(FVector(0.f, 0.f, 1.0f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - motor->cylinderFocus);
+                SetActorLocation(motor->cylinderFocus + relativePos);
+                
+                // Just so we "Run" and face the dash direction
+                MoveRightCylinder(-dir);
+                break;
+            }
+            case EMoyoMotorState::LINEAR:
+            {
+                FVector relativePos = motor->lineDirection * 10.0f;
+                SetActorLocation(GetActorLocation() + dir * relativePos);
+                
+                // Just so we "Run" and face the dash direction
+                MoveRightLinear(dir * dashDirection);
+                break;
+            }
+            default:
+                break;
+        }
 	}
 	else
 	{
