@@ -14,6 +14,10 @@
 #include "Moyo/Public/MoyoPlayerController.h"
 #include "DrawDebugHelpers.h"
 
+#include "Interactable.h"
+#include "Pickup.h"
+#include "InventoryItem.h"
+
 AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer) 
 	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(CharacterMovementComponentName))
@@ -54,6 +58,10 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
+    // Create the pickup collection sphere
+    CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
+    CollectionSphere->SetupAttachment(RootComponent);
+    CollectionSphere->SetSphereRadius(CollectionSphereRadius);
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -135,6 +143,8 @@ void AMoyoCharacter::Tick(float DeltaTime)
 	GlideUpdate(DeltaTime);
 
 	DashUpdate(DeltaTime);
+
+    CheckForInteractables();
 }
 
 
@@ -233,6 +243,31 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 	}
 }
 
+
+void AMoyoCharacter::CheckForInteractables()
+{
+    // Get all overlapping Actors and store them in an array
+    TArray<AActor*> CollectedActors;
+    CollectionSphere->GetOverlappingActors(CollectedActors);
+
+    AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
+
+    // For each collected Actor
+    for(int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+    {
+        // Cast the actor to AInteractable
+        AInteractable* Interactable = Cast<AInteractable>(CollectedActors[iCollected]);
+        // If the cast is successful
+        if(Interactable)
+        {
+
+            UE_LOG(LogTemp, Warning, TEXT("%p"), IController);
+            IController->CurrentInteractable = Interactable;
+            return;
+        }
+    }
+    IController->CurrentInteractable = nullptr;
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Input
