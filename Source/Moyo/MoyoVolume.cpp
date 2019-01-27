@@ -20,7 +20,14 @@ AMoyoVolume::AMoyoVolume(const FObjectInitializer& ObjectInitializer)
 void AMoyoVolume::BeginPlay()
 {
 	surfacedata.priority = priority;
-	surfacedata.isCylinder = cylinderRadius > 1.0f;
+	if (cylinderRadius > 1.0f)
+	{
+		surfacedata.motorState = EMoyoMotorState::CYLINDER;
+	}
+	else
+	{
+		surfacedata.motorState = EMoyoMotorState::LINEAR;
+	}
 	
 	surfacedata.center = collider->GetComponentLocation();
 	surfacedata.center.Z = 0.0f;
@@ -29,38 +36,39 @@ void AMoyoVolume::BeginPlay()
 	surfacedata.start = lineStart;
 	surfacedata.end = lineEnd;
 
+	TArray<AActor*> overlaps;
+	GetOverlappingActors(overlaps);
+	for (auto x : overlaps)
+	{
+		OnBeginOverlap(this, x);
+	}
+
 	OnActorBeginOverlap.AddDynamic(this, &AMoyoVolume::OnBeginOverlap);
 	OnActorEndOverlap.AddDynamic(this, &AMoyoVolume::OnEndOverlap);
 }
 
 void AMoyoVolume::OnBeginOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
 {
-	UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
-	if (OtherMotorComponent)
+	if (OtherActor && acceptedClasses.Contains(OtherActor->GetClass()))
 	{
-		UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
-		OtherMotor->AssignSurface(surfacedata);
+		UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
+		if (OtherMotorComponent)
+		{
+			UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
+			OtherMotor->AssignSurface(surfacedata);
+		}
 	}
 }
 
 void AMoyoVolume::OnEndOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
 {
-
-	UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
-	if (OtherMotorComponent)
+	if (OtherActor && acceptedClasses.Contains(OtherActor->GetClass()))
 	{
-		UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
-		OtherMotor->RemoveSurface(surfacedata);
+		UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
+		if (OtherMotorComponent)
+		{
+			UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
+			OtherMotor->RemoveSurface(surfacedata);
+		}
 	}
-}
-
-void AMoyoVolume::Debug()
-{
-
-	FTransform t = collider->GetComponentToWorld();
-	FVector a = lineStart;
-	FVector c = lineEnd;
-	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), a, 3.0f, FColor::Red, true, 3.0f);
-	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), c, 3.0f, FColor::Green, true, 3.0f);
-
 }

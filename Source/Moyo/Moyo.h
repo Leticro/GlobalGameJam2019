@@ -4,4 +4,5 @@
 
 #include "CoreMinimal.h"
 #include "MoyoTypes.h"
-#include "MoyoCharacter.h"
+#include "MoyoLib.h"
+#include "MoyoGuy.h"
