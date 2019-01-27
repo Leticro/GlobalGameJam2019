@@ -37,7 +37,7 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bDoCollisionTest = false;
 	CameraBoom->TargetArmLength = 800.f;
-    CameraBoom->SocketOffset = FVector(0.f, 0.f, 140.f);
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 80.f);
 	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
