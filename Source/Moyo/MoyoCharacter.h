@@ -43,6 +43,9 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Val);
 
+	void MoveRightCylinder(float Val);
+	void MoveRightLinear(float Val);
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
@@ -94,7 +97,8 @@ protected:
     bool isCylinder;
     float speed;
     float cameraDistance;
-    
+	float inputDir;
+	
     // Cylinder
     FVector cylinderFocus;
     float cylinderRadius;
