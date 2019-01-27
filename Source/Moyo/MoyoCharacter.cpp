@@ -117,7 +117,6 @@ void AMoyoCharacter::Tick(float DeltaTime)
     FVector location = GetActorLocation();
     location.Z = 0.0f;
 
-
 	if (!CameraBoom)
 	{
 		return;
@@ -384,12 +383,6 @@ void AMoyoCharacter::DashDown()
 void AMoyoCharacter::DashUp()
 {
 
-}
-
-bool AMoyoCharacter::CanJumpInternal_Implementation() const
-{
-	return true;
-	//return CanJumpInternal();
 }
 
 bool AMoyoCharacter::LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result)
