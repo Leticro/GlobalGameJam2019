@@ -83,11 +83,17 @@ void AMoyoCharacter::BeginPlay()
 	
 	inputDir = 1.0f;
 	dashDirection = inputDir;
+    
+    
+    
+    
     // TEMP
     
     // Start to Island 01
     //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
     
+    // Island 01
+    //SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
     
     // Island 01 to Island 02
     //SetLine(FVector(-792.0f, 792.0f, 0.0f), FVector(-4200.0f, -3000.0f, 0.0f));
@@ -217,13 +223,13 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 		else
 		{
 
-			//float EaseInOutCurve = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
-			//float EaseOutCurve = FMath::InterpEaseOut(0.0f, dashDistance, t, dashCurveExponent);
-			//float outerT = FMath::Clamp(t * 4.0f, 0.f, 1.f);
-			//float dashNextPos = FMath::Lerp(EaseInOutCurve, EaseOutCurve, outerT);
+			float EaseInOutCurve = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
+			float EaseOutCurve = FMath::InterpEaseOut(0.0f, dashDistance, t, dashCurveExponent);
+			float outerT = FMath::Clamp(t * 4.0f, 0.f, 1.f);
+			float dashNextPos = FMath::Lerp(EaseInOutCurve, EaseOutCurve, outerT);
 
 
-			float dashNextPos = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
+			//float dashNextPos = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
 			float dashPosDelta = (dashNextPos - dashPrevPos) * dashDirection;
 			//float dashVel = dashPosDelta / DeltaTime;
 			//float value = (dashVel * dashDirection) / speed;
