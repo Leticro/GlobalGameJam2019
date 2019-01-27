@@ -21,32 +21,31 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void OnOverlap(AActor* MyOverlappedActor, AActor* OtherActor);
+	void OnBeginOverlap(AActor* MyOverlappedActor, AActor* OtherActor);
+
+
+	UFUNCTION()
+	void OnEndOverlap(AActor* MyOverlappedActor, AActor* OtherActor);
+
+	UFUNCTION(BlueprintCallable)
+		void Debug();
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* root;
 
-
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UCapsuleComponent* collider;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USceneComponent* anchorLeft;
+	UPROPERTY(VisibleAnywhere)
+	FMoyoSurface surfacedata;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	USceneComponent* anchorRight;
-
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UBillboardComponent* iconLeft;
+	int32 priority;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UBillboardComponent* iconRight;
+	float lineLength;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FMoyoCylinder cylinder;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FMoyoLinear linear;
+	float cylinderRadius;
 };

@@ -19,7 +19,14 @@ public:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable)
-	void AssignSurface(FMoyoCylinder cylinder, FMoyoLinear linear);
+	void AssignSurface(FMoyoSurface InSurface);
+
+
+	UFUNCTION(BlueprintCallable)
+	void RemoveSurface(FMoyoSurface surface);
+
+	UPROPERTY()
+	TArray<FMoyoSurface> stack;
 
 	// Movement Parameters
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

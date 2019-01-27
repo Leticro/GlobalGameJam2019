@@ -13,5 +13,6 @@ class UMoyoLib : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+
 	static FVector VectorFromRadians();
 };
