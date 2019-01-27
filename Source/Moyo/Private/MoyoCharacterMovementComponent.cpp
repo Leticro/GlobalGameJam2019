@@ -3,6 +3,8 @@
 //#include "MoyoCharacterMovementComponent.h"
 #include "Moyo/Public/MoyoCharacterMovementComponent.h"
 #include "GameFramework/Character.h"
+#include "CollisionQueryParams.h"
+#include "Engine/World.h"
 
 void UMoyoCharacterMovementComponent::InitializeComponent()
 {
@@ -37,5 +39,39 @@ bool UMoyoCharacterMovementComponent::DoJump(bool bReplayingMoves)
 		}
 	}
 
+	return false;
+}
+
+bool UMoyoCharacterMovementComponent::IsNearingGround(float nearDistance) const
+{
+	if (IsFalling())
+	{
+		FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, GetOwner());
+		RV_TraceParams.bTraceComplex = true;
+		RV_TraceParams.bTraceAsyncScene = true;
+		RV_TraceParams.bReturnPhysicalMaterial = false;
+
+		//Re-initialize hit info
+		FHitResult RV_Hit(ForceInit);
+
+		FVector Start = GetOwner()->GetActorLocation();
+		FVector End = Start + FVector(0.f, 0.f, 1.f) * -500.0f;
+
+		//call GetWorld() from within an actor extending class
+		GetWorld()->LineTraceSingleByChannel(
+			RV_Hit,     //result
+			Start,		//start
+			End,		//end
+			ECollisionChannel::ECC_WorldStatic, //collision channel
+			RV_TraceParams
+		);
+
+		if (RV_Hit.bBlockingHit)
+		{
+			float dist = (RV_Hit.ImpactPoint - Start).Size();
+			return dist < nearDistance;
+		}
+
+	}
 	return false;
 }
