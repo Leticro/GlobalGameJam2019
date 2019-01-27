@@ -84,32 +84,7 @@ void AMoyoCharacter::BeginPlay()
 	inputDir = 1.0f;
 	dashDirection = inputDir;
     
-    
-    // TEMP - Keeping for reference
-    
-    // Start to Island 01
-    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
-    
-    // Island 01
-    //SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
-    
-    // Island 01 to Island 02
-    //SetLine(FVector(-792.0f, 792.0f, 0.0f), FVector(-4200.0f, -3000.0f, 0.0f));
-    
-    // Island 02
-    //SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
-    
-    // Island 02 to Island 03
-    //SetLine(FVector(4800.0f, -3600.0f, 0.0f), FVector(-3600.0f, -2800.0f, 0.0f));
-    
-    // Island 03
-    //SetCylinder(FVector(4500.0f, -4500.0f, 0.0f), 1120.0f);
-    
-    // Island 03 to Island 04
-    //SetLine(FVector(3910.0f, -10.0f, 0.0f), FVector(3370.0f, -4380.0f, 0.0f));
-    
-    // Island 04
-    //SetCylinder(FVector(4900.0f, 0.0f, 0.0f), 1000.0f);
+
 }
 
 // Called every frame

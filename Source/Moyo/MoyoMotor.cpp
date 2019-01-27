@@ -43,21 +43,34 @@ void UMoyoMotor::ClampToCylinder()
 
 FVector UMoyoMotor::GetForwardVector(float input) const
 {
+	if (isCylinder)
+	{
+		FVector location = GetOwner()->GetActorLocation();
+		location.Z = 0.0f;
+		const FVector radius = location - cylinderFocus;
+		const FVector newRadius = radius.RotateAngleAxis(input, FVector(0.0f, 0.0f, 1.0f));
 
-	FVector location = GetOwner()->GetActorLocation();
-	location.Z = 0.0f;
-	const FVector radius = location - cylinderFocus;
-	const FVector newRadius = radius.RotateAngleAxis(input, FVector(0.0f, 0.0f, 1.0f));
-
-	FVector tangent = newRadius - radius;
-	tangent.Z = 0;
-	tangent.Normalize();
-	return tangent;
+		FVector tangent = newRadius - radius;
+		tangent.Z = 0;
+		tangent.Normalize();
+		return tangent;
+	}
+	else
+	{
+		return lineDirection;
+	}
 }
 
 float UMoyoMotor::GetForwardScalar(float input) const
 {
-	return 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(input / 2.0f)));
+	if (isCylinder)
+	{
+		return 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(input / 2.0f)));
+	}
+	else
+	{
+		return input;
+	}
 }
 
 void UMoyoMotor::AssignSurface(FMoyoSurface surface)

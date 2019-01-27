@@ -8,8 +8,6 @@ public class MoyoEditorTarget : TargetRules
 	public MoyoEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-        bUseUnityBuild = false;
-        bUsePCHFiles = false;
         ExtraModuleNames.Add("Moyo");
 	}
 }

@@ -8,8 +8,6 @@ public class MoyoTarget : TargetRules
 	public MoyoTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Game;
-        bUseUnityBuild = false;
-        bUsePCHFiles = false;
         ExtraModuleNames.Add("Moyo");
 	}
 }
