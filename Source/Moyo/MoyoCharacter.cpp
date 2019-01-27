@@ -88,11 +88,17 @@ void AMoyoCharacter::BeginPlay()
     // Island 02
     //SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
     
+    // Island 02 to Island 03
+    SetLine(FVector(4500.0f, -3380.0f, 0.0f), FVector(-3200.0f, -2600.0f, 0.0f));
+    
     // Island 03
     //SetCylinder(FVector(4500.0f, -4500.0f, 0.0f), 1120.0f);
     
+    // Island 03 to Island 04
+    //SetLine(FVector(3910.0f, -10.0f, 0.0f), FVector(3370.0f, -4380.0f, 0.0f));
+    
     // Island 04
-    SetCylinder(FVector(4900.0f, 0.0f, 0.0f), 1000.0f);
+    //SetCylinder(FVector(4900.0f, 0.0f, 0.0f), 1000.0f);
 }
 
 // Called every frame
