@@ -55,12 +55,18 @@ protected:
 	void GlideUp();
 	void GlideUpdate(float DeltaTime);
 
+	void DashDown();
+	void DashUp();
+	void DashUpdate(float DeltaTime);
+	
+
 	virtual bool CanJumpInternal_Implementation() const override;
 
 	bool LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result);
 
 
 public:
+	// Sling fields
 	UPROPERTY(EditAnywhere)
 	float minSlingRadius = 50.f;
 	UPROPERTY(EditAnywhere)
@@ -69,6 +75,13 @@ public:
 	float minSlingVelocity = 50.f;
 	UPROPERTY(EditAnywhere)
 	float maxSlingVelocity = 200.f;
+
+	// Dash fields
+	UPROPERTY(EditAnywhere)
+		float dashDuration = 0.5f;
+	UPROPERTY(EditAnywhere)
+		float dashDistance = 100.0f;
+
 
 protected:
 
@@ -97,6 +110,11 @@ protected:
 	float gravityScaleTarget;
 	float defaultGravityScale;
 	FFloatSpringState hoverSpringState;
+
+	// Dash fields
+	//float dashTimestepAccumulator;
+	float dashDirection;
+	float dashStartTime;
 
 public:
 	AMoyoCharacter();
