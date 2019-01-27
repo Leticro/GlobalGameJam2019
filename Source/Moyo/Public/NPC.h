@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Engine.h"
-
 #include "Interactable.h"
 #include "NPC.generated.h"
 
@@ -13,7 +12,7 @@ class MOYO_API ANPC : public AInteractable
 public:
     ANPC();
 
-    void Interact_Implementation(APlayerController* Controller) override;
+    void Interact_Implementation(APlayerController* Controller, AMoyoCharacter* Character) override;
 
 protected:
     UPROPERTY(EditAnywhere)

@@ -1,20 +1,20 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "Interactable.h"
+#include "InteractableComponent.h"
 
 // Sets default values
-AInteractable::AInteractable()
+UInteractableComponent::UInteractableComponent()
 {
     Name = "Interactible";
     Action = "interact";
 }
 
-void AInteractable::Interact_Implementation(APlayerController* Controller, AMoyoCharacter* Character)
+void UInteractableComponent::Interact_Implementation(APlayerController* Controller, AMoyoCharacter* Character)
 {
     return;
 }
 
-FString AInteractable::GetInteractText() const
+FString UInteractableComponent::GetInteractText() const
 {
     return FString::Printf(TEXT("%s: Press E to %s"), *Name, *Action);
 }

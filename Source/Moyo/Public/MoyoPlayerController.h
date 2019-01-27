@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 
+#include "MoyoCharacter.h"
 #include "Interactable.h"
 #include "InventoryItem.h"
 #include "Pickup.h"
@@ -32,6 +33,12 @@ public:
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
         class AInteractable* CurrentInteractable;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+        class UInteractableComponent* CurrentInteractableComponent;
+
+    UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+        class AMoyoCharacter* CurrentPawn;
 
     UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
         TArray<FInventoryItem> Inventory;

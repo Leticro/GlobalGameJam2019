@@ -5,16 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MoyoCharacter.h"
-#include "Interactable.generated.h"
+#include "InteractableComponent.generated.h"
 
 UCLASS()
-class MOYO_API AInteractable : public AActor
+class MOYO_API UInteractableComponent : public UActorComponent
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AInteractable();
+    UInteractableComponent();
 
     UFUNCTION(BlueprintNativeEvent)
         void Interact(APlayerController* Controller, AMoyoCharacter* Character);
