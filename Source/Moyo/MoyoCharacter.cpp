@@ -209,7 +209,7 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
 	{
 		MoyoCharMovementComp->GravityScale = defaultGravityScale;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("GlideAmount: %f, GravityScale: %f"), glideAmount, MoyoCharMovementComp->GravityScale);
+	//UE_LOG(LogTemp, Warning, TEXT("GlideAmount: %f, GravityScale: %f"), glideAmount, MoyoCharMovementComp->GravityScale);
 }
 
 
