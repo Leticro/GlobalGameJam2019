@@ -62,9 +62,6 @@ protected:
 	void DashUp();
 	void DashUpdate(float DeltaTime);
 
-
-	virtual bool CanJumpInternal_Implementation() const override;
-
 	bool LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result);
     
     /** Function to check for the closest Interactable in sight and in range. */
@@ -104,7 +101,6 @@ protected:
 
     // Movement Parameters
     float speed;
-	float inputDir;
 	// Hover fields
 	UPROPERTY(EditAnywhere)
 	float glideGravityScale = 1.0f;
@@ -112,9 +108,6 @@ protected:
 	float glideIntention;
 	float defaultGravityScale;
 	FFloatSpringState hoverSpringState;
-	
-	
-
 
 	// Dash fields
 	float dashDirection;
@@ -125,9 +118,6 @@ protected:
 
 public:
 	AMoyoCharacter();
-
-	
-    
 
 	/** Returns SideViewCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }

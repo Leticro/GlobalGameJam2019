@@ -71,7 +71,7 @@ public:
 public:
 
 	/** Called for side to side input */
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Moyo")
 	void MoveRight(float Val);
 
 	void MoveRightCylinder(float Val);
