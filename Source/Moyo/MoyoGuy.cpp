@@ -75,6 +75,16 @@ void AMoyoGuy::Tick(float DeltaTime)
 		DoFallOut();
 	}
 
+	if (GetCharacterMovement()->IsMovingOnGround())
+	{
+		footRemaining -= DeltaTime;
+		if (footRemaining < 0)
+		{
+			footRemaining = 1.0f;
+			DoKeepWalking();
+		}
+	}
+
 }
 
 
@@ -114,7 +124,8 @@ void AMoyoGuy::MoveRightLinear(float Value)
 
 void AMoyoGuy::DoDeath_Implementation()
 {
-	LaunchCharacter(FVector(999.9f, 999.9f, 999.9f), false, false);
+	FVector LaunchVector = 99.9f * GetActorLocation();
+	LaunchCharacter(LaunchVector, false, false);
 	motor->motorState = EMoyoMotorState::NONE;
 }
 

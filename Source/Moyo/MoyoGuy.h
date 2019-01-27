@@ -31,6 +31,34 @@ public:
 
 
 	UFUNCTION(BlueprintNativeEvent)
+	void DoDash();
+	virtual void DoDash_Implementation() { return; }
+
+
+	UFUNCTION(BlueprintNativeEvent)
+	void DoKeepFloat();
+	virtual void DoKeepFloat_Implementation() { return; }
+
+	UFUNCTION(BlueprintNativeEvent)
+	void DoKeepWalking();
+	virtual void DoKeepWalking_Implementation() { return; }
+
+
+	UFUNCTION(BlueprintNativeEvent)
+	void DoPickup();
+	virtual void DoPickup_Implementation() { return; }
+
+	UFUNCTION(BlueprintNativeEvent)
+	void DoGreeting();
+	virtual void DoGreeting_Implementation() { return; }
+
+
+	UFUNCTION(BlueprintNativeEvent)
+	void DoDrop();
+	virtual void DoDrop_Implementation() { return; }
+
+
+	UFUNCTION(BlueprintNativeEvent)
 	void DoFallOut();
 	virtual void DoFallOut_Implementation();
 
@@ -63,6 +91,12 @@ protected:
 	float speed;
 	UPROPERTY()
 	float inputDir;
+
+	UPROPERTY()
+	float floatRemaining;
+
+	UPROPERTY()
+	float footRemaining;
 
 
 public:

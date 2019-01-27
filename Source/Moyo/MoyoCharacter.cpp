@@ -123,6 +123,15 @@ void AMoyoCharacter::Tick(float DeltaTime)
 
 	}
 
+	if (gravityScaleTarget < 0.9f*defaultGravityScale)
+	{
+		floatRemaining -= DeltaTime;
+		if (floatRemaining < 0)
+		{
+			floatRemaining = 7.5f;
+			DoKeepFloat();
+		}
+	}
 	switch (motor->motorState)
 	{
 	case EMoyoMotorState::CYLINDER:
