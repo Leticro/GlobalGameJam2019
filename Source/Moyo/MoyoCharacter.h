@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
+
 #include "MoyoCharacter.generated.h"
 
 class UMoyoCharacterMovementComponent;
@@ -49,6 +51,9 @@ protected:
 	void SlingUp();
 	void SlingUpdateTrajectory(float DeltaTime);
 
+	void GlideDown();
+	void GlideUp();
+	void GlideUpdate(float DeltaTime);
 
 	virtual bool CanJumpInternal_Implementation() const override;
 
@@ -67,7 +72,7 @@ public:
 
 protected:
 
-	// Sling Parameters
+	// Sling fields
 	bool bSlingHeld;
 	FVector slingDir;
 	float slingMag;
@@ -85,6 +90,13 @@ protected:
     FVector lineStartPoint;
     FVector lineEndPoint;
     FVector lineDirection;
+
+	// Hover fields
+	UPROPERTY(EditAnywhere)
+	float glideGravityScale = 1.f;
+	float gravityScaleTarget;
+	float defaultGravityScale;
+	FFloatSpringState hoverSpringState;
 
 public:
 	AMoyoCharacter();
