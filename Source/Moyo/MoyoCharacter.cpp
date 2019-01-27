@@ -85,9 +85,7 @@ void AMoyoCharacter::BeginPlay()
 	dashDirection = inputDir;
     
     
-    
-    
-    // TEMP
+    // TEMP - Keeping for reference
     
     // Start to Island 01
     //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));

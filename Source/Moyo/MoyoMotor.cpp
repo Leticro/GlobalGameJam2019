@@ -15,12 +15,14 @@ UMoyoMotor::UMoyoMotor()
 void UMoyoMotor::BeginPlay()
 {
 	Super::BeginPlay();
-	isCylinder = true;
-	cylinderFocus = FVector(-3200.0f, -4000.0f, 0.0f),
-	cylinderRadius = 1414.0f;
-
-	// ...
-
+    
+    // Hardcode to "Start to Island01"
+	isCylinder = false;
+    lineStartPoint = FVector(4200.0f, 1120.0f, 0.0f);
+    lineEndPoint = FVector(-20.0f, 1120.0f, 0.0f);
+    lineDirection = lineEndPoint - lineStartPoint;
+    lineDirection.Z = 0.0f;
+    lineDirection.Normalize();
 }
 
 
