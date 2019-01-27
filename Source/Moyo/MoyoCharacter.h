@@ -65,8 +65,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	float maxSlingVelocity = 200.f;
 
-
-
 protected:
 
 	// Sling Parameters
@@ -75,14 +73,27 @@ protected:
 	float slingMag;
     
     // Movement Parameters
-    FVector centerPosition;
-    float radiusLength;
+    bool isCylinder;
     float speed;
     float cameraDistance;
-
+    
+    // Cylinder
+    FVector cylinderFocus;
+    float cylinderRadius;
+    
+    // Line
+    FVector lineStartPoint;
+    FVector lineEndPoint;
+    FVector lineDirection;
 
 public:
 	AMoyoCharacter();
+    
+    // Sets Cylindrical Motion
+    void SetCylinder(FVector center, float radius);
+    
+    // Sets Linear Motion
+    void SetLine(FVector start, FVector end);
 
 	/** Returns SideViewCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }

@@ -69,13 +69,12 @@ void AMoyoCharacter::BeginPlay()
 
 	bSlingHeld = false;
     
-    // Initialize Cylinder movement (TEMP)
-    FVector position = GetActorLocation();
-    
-    centerPosition = FVector(1200.0f, 20.0f, 0.0f);
-    radiusLength = (position - centerPosition).Size();
     speed = 24.0f;
     cameraDistance = 75.0f;
+    
+    // TEMP
+    SetCylinder(FVector(1200.0f, 20.0f, 0.0f), 500.0f);
+    //SetLine(FVector(1200.0f, 20.0f, 0.0f), FVector(1800.0f, 50.0f, 0.0f));
 }
 
 // Called every frame
@@ -83,18 +82,32 @@ void AMoyoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
     
-    // Restore radius
+    // Correct location if outside rails
     FVector location = GetActorLocation();
     FVector elevation = FVector(0.0f, 0.0f, location.Z);
     location.Z = 0.0f;
-    FVector currentRadius = location - centerPosition;
     
-    currentRadius.Normalize();
-    
-    SetActorLocation(centerPosition + elevation + currentRadius * radiusLength);
-    
-    // Set Camera Position/Rotation
-    CameraBoom->SetWorldRotation((-currentRadius).Rotation());
+    if(isCylinder) { // --- Cylinder
+        
+        // Character Position
+        FVector currentRadius = location - cylinderFocus;
+        currentRadius.Normalize();
+        SetActorLocation(cylinderFocus + elevation + currentRadius * cylinderRadius);
+        
+        // Camera Position/Rotation
+        CameraBoom->SetWorldRotation((-currentRadius).Rotation());
+        
+    }else{ // --- Line
+        // This should not happen often, so it's ok if we value speed over accuracy
+        
+        FVector sToP = location - lineStartPoint;
+        FVector newLocation = lineDirection * sToP.Size();
+        SetActorLocation(lineStartPoint + elevation + newLocation);
+        
+        FVector cameraDir = FVector::CrossProduct(lineDirection, FVector(0.0f, 0.0f, 1.0f));
+        
+        CameraBoom->SetWorldRotation((-cameraDir).Rotation());
+    }
 
 	//UE_LOG(LogTemp, Warning, TEXT("MoyoCharacter: Tick was called"));
 	if (bSlingHeld)
@@ -146,24 +159,47 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
 }
 
+void AMoyoCharacter::SetCylinder(FVector center, float radius) {
+    isCylinder = true;
+    
+    cylinderFocus = center;
+    cylinderRadius = radius;
+}
+
+void AMoyoCharacter::SetLine(FVector start, FVector end) {
+    isCylinder = false;
+    
+    lineStartPoint = start;
+    lineEndPoint = end;
+    lineDirection = lineEndPoint - lineStartPoint;
+    lineDirection.Z = 0.0f;
+    lineDirection.Normalize();
+}
+
 void AMoyoCharacter::MoveRight(float Value)
 {
     // Find new movement direction
-    
     FVector location = GetActorLocation();
-    float angle = speed * Value;
     
-    FVector radius = location - centerPosition;
-    
-    FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
-    
-    FVector tangent = newRadius - radius;
-    tangent.Normalize();
-    
-    float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle/2.0f)));
-    
-	// add movement in that direction
-	AddMovementInput(-tangent, distance);
+    if(isCylinder) { // --- Cylinder
+        float angle = speed * Value;
+        
+        FVector radius = location - cylinderFocus;
+        FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
+        
+        FVector tangent = newRadius - radius;
+        tangent.Normalize();
+        
+        float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle/2.0f)));
+        
+        // add movement in that direction
+        AddMovementInput(-tangent, distance);
+    }else{ // --- Line
+        
+        // add movement in the direction
+        AddMovementInput(-lineDirection, speed * Value);
+        
+    }
 }
 
 
