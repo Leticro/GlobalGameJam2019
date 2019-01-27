@@ -11,6 +11,9 @@
 #include "Moyo/Public/MoyoPlayerController.h"
 #include "DrawDebugHelpers.h"
 
+#include "Interactable.h"
+#include "InventoryItem.h"
+
 AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer) 
 	//: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UMoyoCharacterMovementComponent>(CharacterMovementComponentName))
@@ -48,6 +51,10 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
 
+    // Create the pickup collection sphere
+    CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
+    CollectionSphere->SetupAttachment(RootComponent);
+    CollectionSphere->SetSphereRadius(200.f);
 
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -106,6 +113,7 @@ void AMoyoCharacter::Tick(float DeltaTime)
 
 	GlideUpdate(DeltaTime);
 
+    CheckForInteractables();
 }
 
 
@@ -151,6 +159,39 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
 }
 
 
+void AMoyoCharacter::CheckForInteractables()
+{
+    //// Create a LineTrace to check for a hit
+    //FHitResult HitResult;
+
+    //int32 Range = 500;
+    //FVector StartTrace = FollowCamera->GetComponentLocation();
+    //FVector EndTrace = (FollowCamera->GetForwardVector() * Range) + StartTrace;
+
+    //FCollisionQueryParams QueryParams;
+    //QueryParams.AddIgnoredActor(this);
+
+    //AMoyoCharacter* IController = Cast<AMoyoCharacter>(GetController());
+
+    //if(IController)
+    //{
+    //    // Check if something is hit
+    //    if(GetWorld()->LineTraceSingleByChannel(HitResult, StartTrace, EndTrace, ECC_Visibility, QueryParams))
+    //    {
+    //        // Cast the actor to AInteractable
+    //        AInteractable* Interactable = Cast<AInteractable>(HitResult.GetActor());
+    //        // If the cast is successful
+    //        if(Interactable)
+    //        {
+    //            IController->CurrentInteractable = Interactable;
+    //            return;
+    //        }
+    //    }
+
+    //    IController->CurrentInteractable = nullptr;
+    //}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -162,7 +203,6 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
     PlayerInputComponent->BindAction("Sling", IE_Released, this, &AMoyoCharacter::SlingUp);
 	PlayerInputComponent->BindAction("Glide", IE_Pressed, this, &AMoyoCharacter::GlideDown);
 	PlayerInputComponent->BindAction("Glide", IE_Released, this, &AMoyoCharacter::GlideUp);
-
 
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
 }
