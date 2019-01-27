@@ -104,7 +104,6 @@ protected:
 
     // Movement Parameters
     float speed;
-	float inputDir;
 	// Hover fields
 	UPROPERTY(EditAnywhere)
 	float glideGravityScale = 1.0f;

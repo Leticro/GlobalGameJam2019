@@ -7,6 +7,7 @@
 
 #include "Interactable.h"
 #include "InventoryItem.h"
+#include "Pickup.h"
 #include "MoyoPlayerController.generated.h"
 
 /**
@@ -40,6 +41,8 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         int32 InventoryWeightLimit;
+
+    class APickup* CurrentObject;
 
 protected:
     void Interact();

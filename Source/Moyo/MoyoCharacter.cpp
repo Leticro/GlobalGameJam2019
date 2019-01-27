@@ -230,31 +230,37 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 			float outerT = FMath::Clamp(t * 4.0f, 0.f, 1.f);
 			float dashNextPos = FMath::Lerp(EaseInOutCurve, EaseOutCurve, outerT);
 
+            float dir = -1.0f;
+            if(inputDir < 0.0f) {
+                dir = 1.0f;
+            }
 
 			//float dashNextPos = FMath::InterpEaseInOut(0.0f, dashDistance, t, dashCurveExponent);
 			float dashPosDelta = (dashNextPos - dashPrevPos) * dashDirection;
 			//float dashVel = dashPosDelta / DeltaTime;
 			//float value = (dashVel * dashDirection) / speed;
-			//UE_LOG(LogTemp, Warning, TEXT("dashVel: %f, dashDir: %f, speed: %f, value: %f"), dashVel, dashDirection, speed, value);
 			
 			switch (motor->motorState)
 			{
 			case EMoyoMotorState::CYLINDER:
 			{
 				float angle = -dashPosDelta * (180.f / (motor->cylinderRadius * 3.14159265f));
-				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - motor->cylinderFocus);
+				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.0f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - motor->cylinderFocus);
 				SetActorLocation(motor->cylinderFocus + relativePos);
 
 				// Just so we "Run" and face the dash direction
 				MoveRightCylinder(dashDirection);
 				break;
 			}
-			case EMoyoMotorState::LINEAR:
-				// Linear not implemented yet
+            case EMoyoMotorState::LINEAR:
+            {
+                FVector relativePos = motor->lineDirection * 16.0f;
+                SetActorLocation(GetActorLocation() + dir * relativePos);
 
 				// Just so we "Run" and face the dash direction
-				MoveRightLinear(dashDirection);
+				MoveRightLinear(dir * dashDirection);
 				break;
+            }
 			default:
 				break;
 			}
@@ -275,22 +281,39 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 
 void AMoyoCharacter::CheckForInteractables()
 {
-    // Get all overlapping Actors and store them in an array
-    TArray<AActor*> CollectedActors;
-    CollectionSphere->GetOverlappingActors(CollectedActors);
 
     AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
 
-    // For each collected Actor
-    for(int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+    if(IController->Inventory.Num())
     {
-        // Cast the actor to AInteractable
-        AInteractable* Interactable = Cast<AInteractable>(CollectedActors[iCollected]);
-        // If the cast is successful
-        if(Interactable)
+        FVector playerLoc = GetActorLocation();
+        playerLoc.Z += 100;
+        IController->CurrentObject->SetActorLocation(playerLoc);
+    }
+    else if(IController->CurrentObject)
+    {
+        FVector forward = GetActorLocation() + CameraBoom->GetForwardVector() * 80.0f;
+
+        IController->CurrentObject->SetActorLocation(forward);
+        IController->CurrentObject = nullptr;
+
+    } else
+    {
+        // Get all overlapping Actors and store them in an array
+        TArray<AActor*> CollectedActors;
+        CollectionSphere->GetOverlappingActors(CollectedActors);
+
+        // For each collected Actor
+        for(int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
         {
-            IController->CurrentInteractable = Interactable;
-            return;
+            // Cast the actor to AInteractable
+            AInteractable* Interactable = Cast<AInteractable>(CollectedActors[iCollected]);
+            // If the cast is successful
+            if(Interactable)
+            {
+                IController->CurrentInteractable = Interactable;
+                return;
+            }
         }
     }
     IController->CurrentInteractable = nullptr;
