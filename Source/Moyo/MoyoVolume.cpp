@@ -7,9 +7,13 @@
 
 AMoyoVolume::AMoyoVolume(const FObjectInitializer& ObjectInitializer) 
 {
+	FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
 	root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
-	FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
+	collider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Cap"));
+	collider->SetCapsuleSize(800.0f,800.0f,1.0f);
+	collider->AttachToComponent(root, rules);
+
 	anchorLeft = CreateDefaultSubobject<USceneComponent>(TEXT("Left"));
 	anchorLeft->AttachToComponent(root, rules);
 	anchorLeft->SetRelativeLocation(FVector::ForwardVector*100.0f);
@@ -58,16 +62,20 @@ AMoyoVolume::AMoyoVolume(const FObjectInitializer& ObjectInitializer)
 
 void AMoyoVolume::BeginPlay()
 {
-	TArray<AActor*> AllActors;
-	GetOverlappingActors(AllActors);
-	for (auto x : AllActors)
+	TArray<AActor*> otherList;
+	GetOverlappingActors(otherList);
+	for (auto other : otherList)
 	{
-		OnOverlap(this, x);
+		OnOverlap(this, other);
 	}
 }
 
 void AMoyoVolume::OnOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
 {
+	cylinder.center = collider->GetComponentLocation();
+	linear.start = anchorLeft->GetComponentLocation();
+	linear.end = anchorRight->GetComponentLocation();
+
 	UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
 	if (OtherMotorComponent)
 	{

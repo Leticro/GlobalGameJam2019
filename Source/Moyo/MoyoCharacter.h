@@ -87,9 +87,11 @@ public:
 		float dashDistance = 100.0f;
 
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMoyoMotor* motor;
+
 protected:
 
-	UMoyoMotor* motor;
 
 	// Sling fields
 	bool bSlingHeld;
@@ -100,16 +102,6 @@ protected:
     bool isCylinder;
     float speed;
 		float inputDir;
-
-    // Cylinder
-    FVector cylinderFocus;
-    float cylinderRadius;
-
-    // Line
-    FVector lineStartPoint;
-    FVector lineEndPoint;
-    FVector lineDirection;
-
 	// Hover fields
 	UPROPERTY(EditAnywhere)
 	float glideGravityScale = 1.f;
@@ -126,11 +118,6 @@ public:
 	AMoyoCharacter();
 
     
-    // Sets Cylindrical Motion
-    void SetCylinder(FVector center, float radius);
-
-    // Sets Linear Motion
-    void SetLine(FVector start, FVector end);
 
 	/** Returns SideViewCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }

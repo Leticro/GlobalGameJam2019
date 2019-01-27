@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Components/ArrowComponent.h"
 #include "Components/SceneComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/BillboardComponent.h"
 #include "MoyoTypes.h"
 #include "MoyoVolume.generated.h"
@@ -25,6 +26,10 @@ public:
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* root;
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UCapsuleComponent* collider;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	USceneComponent* anchorLeft;
