@@ -31,8 +31,8 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bDoCollisionTest = false;
-	CameraBoom->TargetArmLength = 500.f;
-	CameraBoom->SocketOffset = FVector(0.f, 0.f, 75.f);
+	CameraBoom->TargetArmLength = 800.f;
+	CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
 	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
@@ -73,11 +73,17 @@ void AMoyoCharacter::BeginPlay()
 	gravityScaleTarget = defaultGravityScale;
     
     speed = 24.0f;
-    cameraDistance = 75.0f;
     
     // TEMP
+    
+    // Start to Island 01
+    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
+    
+    // Island 01
     SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
-    //SetLine(FVector(1200.0f, 20.0f, 0.0f), FVector(1800.0f, 50.0f, 0.0f));
+    
+    // Island 01 to Island 02
+    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
 }
 
 // Called every frame
@@ -102,6 +108,8 @@ void AMoyoCharacter::Tick(float DeltaTime)
         SetActorLocation(cylinderFocus + elevation + currentRadius * cylinderRadius);
         
         // Camera Position/Rotation
+        //currentRadius.Z = 0.8f;
+        //currentRadius.Normalize();
         CameraBoom->SetWorldRotation((-currentRadius).Rotation());
         
     }else{ // --- Line
@@ -119,10 +127,12 @@ void AMoyoCharacter::Tick(float DeltaTime)
 	//UE_LOG(LogTemp, Warning, TEXT("MoyoCharacter: Tick was called"));
 	if (bSlingHeld)
 	{
-		SlingUpdateTrajectory(DeltaTime);
+		//Disabled for now 
+		//SlingUpdateTrajectory(DeltaTime);
 	}
 
 	GlideUpdate(DeltaTime);
+
 
 }
 
@@ -169,6 +179,16 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
 }
 
 
+void AMoyoCharacter::DashUpdate(float DeltaTime)
+{
+
+
+
+
+	
+}
+
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -180,9 +200,11 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
     PlayerInputComponent->BindAction("Sling", IE_Released, this, &AMoyoCharacter::SlingUp);
 	PlayerInputComponent->BindAction("Glide", IE_Pressed, this, &AMoyoCharacter::GlideDown);
 	PlayerInputComponent->BindAction("Glide", IE_Released, this, &AMoyoCharacter::GlideUp);
-
+	PlayerInputComponent->BindAction("Dash", IE_Pressed, this, &AMoyoCharacter::DashDown);
+	PlayerInputComponent->BindAction("Dash", IE_Released, this, &AMoyoCharacter::DashUp);
 
     PlayerInputComponent->BindAxis("MoveRight", this, &AMoyoCharacter::MoveRight);
+
 }
 
 
@@ -191,6 +213,7 @@ void AMoyoCharacter::SetCylinder(FVector center, float radius) {
     
     cylinderFocus = center;
     cylinderRadius = radius;
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
 }
 
 void AMoyoCharacter::SetLine(FVector start, FVector end) {
@@ -201,32 +224,48 @@ void AMoyoCharacter::SetLine(FVector start, FVector end) {
     lineDirection = lineEndPoint - lineStartPoint;
     lineDirection.Z = 0.0f;
     lineDirection.Normalize();
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
 }
+
+
 
 void AMoyoCharacter::MoveRight(float Value)
 {
-    // Find new movement direction
-    FVector location = GetActorLocation();
+	inputDir = Value;
     
     if(isCylinder) { // --- Cylinder
-        float angle = speed * Value;
-        
-        FVector radius = location - cylinderFocus;
-        FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
-        
-        FVector tangent = newRadius - radius;
-        tangent.Normalize();
-        
-        float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle/2.0f)));
-        
-        // add movement in that direction
-        AddMovementInput(-tangent, distance);
-    }else{ // --- Line
-        
-        // add movement in the direction
-        AddMovementInput(-lineDirection, speed * Value);
+		MoveRightCylinder(Value);
+    
+	}else{ // --- Line
+		MoveRightLinear(Value);
         
     }
+}
+
+
+void AMoyoCharacter::MoveRightCylinder(float Value)
+{
+	// Find new movement direction
+	FVector location = GetActorLocation();
+
+	float angle = speed * Value;
+
+	FVector radius = location - cylinderFocus;
+	FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
+
+	FVector tangent = newRadius - radius;
+	tangent.Normalize();
+
+	float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle / 2.0f)));
+
+	// add movement in that direction
+	AddMovementInput(-tangent, distance);
+}
+
+void AMoyoCharacter::MoveRightLinear(float Value)
+{
+	// add movement in the direction
+	AddMovementInput(-lineDirection, speed * Value);
 }
 
 
@@ -253,6 +292,16 @@ void AMoyoCharacter::GlideDown()
 void AMoyoCharacter::GlideUp()
 {
 	gravityScaleTarget = defaultGravityScale;
+}
+
+void AMoyoCharacter::DashDown()
+{
+	
+}
+
+void AMoyoCharacter::DashUp()
+{
+
 }
 
 bool AMoyoCharacter::CanJumpInternal_Implementation() const

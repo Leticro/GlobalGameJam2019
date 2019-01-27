@@ -44,6 +44,9 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Val);
 
+	void MoveRightCylinder(float Val);
+	void MoveRightLinear(float Val);
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
@@ -56,12 +59,18 @@ protected:
 	void GlideUp();
 	void GlideUpdate(float DeltaTime);
 
+	void DashDown();
+	void DashUp();
+	void DashUpdate(float DeltaTime);
+
+
 	virtual bool CanJumpInternal_Implementation() const override;
 
 	bool LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result);
 
 
 public:
+	// Sling fields
 	UPROPERTY(EditAnywhere)
 	float minSlingRadius = 50.f;
 	UPROPERTY(EditAnywhere)
@@ -71,6 +80,13 @@ public:
 	UPROPERTY(EditAnywhere)
 	float maxSlingVelocity = 200.f;
 
+	// Dash fields
+	UPROPERTY(EditAnywhere)
+		float dashDuration = 0.5f;
+	UPROPERTY(EditAnywhere)
+		float dashDistance = 100.0f;
+
+
 protected:
 
 	UMoyoMotor* motor;
@@ -79,16 +95,16 @@ protected:
 	bool bSlingHeld;
 	FVector slingDir;
 	float slingMag;
-    
+
     // Movement Parameters
     bool isCylinder;
     float speed;
-    float cameraDistance;
-    
+		float inputDir;
+
     // Cylinder
     FVector cylinderFocus;
     float cylinderRadius;
-    
+
     // Line
     FVector lineStartPoint;
     FVector lineEndPoint;
@@ -101,13 +117,18 @@ protected:
 	float defaultGravityScale;
 	FFloatSpringState hoverSpringState;
 
+	// Dash fields
+	//float dashTimestepAccumulator;
+	float dashDirection;
+	float dashStartTime;
+
 public:
 	AMoyoCharacter();
 
     
     // Sets Cylindrical Motion
     void SetCylinder(FVector center, float radius);
-    
+
     // Sets Linear Motion
     void SetLine(FVector start, FVector end);
 
