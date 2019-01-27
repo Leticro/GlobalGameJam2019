@@ -117,7 +117,6 @@ protected:
 	FFloatSpringState hoverSpringState;
 
 	// Dash fields
-	//float dashTimestepAccumulator;
 	float dashDirection;
 	float dashStartTime;
 	float dashPrevPos;
