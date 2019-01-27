@@ -30,8 +30,8 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bDoCollisionTest = false;
-	CameraBoom->TargetArmLength = 500.f;
-	CameraBoom->SocketOffset = FVector(0.f, 0.f, 75.f);
+	CameraBoom->TargetArmLength = 800.f;
+	CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
 	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
@@ -72,7 +72,6 @@ void AMoyoCharacter::BeginPlay()
 	gravityScaleTarget = defaultGravityScale;
     
     speed = 24.0f;
-    cameraDistance = 75.0f;
     
     // TEMP
     SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
@@ -97,6 +96,8 @@ void AMoyoCharacter::Tick(float DeltaTime)
         SetActorLocation(cylinderFocus + elevation + currentRadius * cylinderRadius);
         
         // Camera Position/Rotation
+        currentRadius.Z = cylinderRadius/3200.0f;
+        currentRadius.Normalize();
         CameraBoom->SetWorldRotation((-currentRadius).Rotation());
         
     }else{ // --- Line

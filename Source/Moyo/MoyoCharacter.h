@@ -93,7 +93,6 @@ protected:
     // Movement Parameters
     bool isCylinder;
     float speed;
-    float cameraDistance;
     
     // Cylinder
     FVector cylinderFocus;
