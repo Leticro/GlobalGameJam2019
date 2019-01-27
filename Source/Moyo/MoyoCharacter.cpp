@@ -74,8 +74,15 @@ void AMoyoCharacter::BeginPlay()
     speed = 24.0f;
     
     // TEMP
+    
+    // Start to Island 01
+    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
+    
+    // Island 01
     SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
-    //SetLine(FVector(1200.0f, 20.0f, 0.0f), FVector(1800.0f, 50.0f, 0.0f));
+    
+    // Island 01 to Island 02
+    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
 }
 
 // Called every frame
@@ -96,8 +103,8 @@ void AMoyoCharacter::Tick(float DeltaTime)
         SetActorLocation(cylinderFocus + elevation + currentRadius * cylinderRadius);
         
         // Camera Position/Rotation
-        currentRadius.Z = cylinderRadius/3200.0f;
-        currentRadius.Normalize();
+        //currentRadius.Z = 0.8f;
+        //currentRadius.Normalize();
         CameraBoom->SetWorldRotation((-currentRadius).Rotation());
         
     }else{ // --- Line
@@ -200,6 +207,7 @@ void AMoyoCharacter::SetCylinder(FVector center, float radius) {
     
     cylinderFocus = center;
     cylinderRadius = radius;
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
 }
 
 void AMoyoCharacter::SetLine(FVector start, FVector end) {
@@ -210,6 +218,7 @@ void AMoyoCharacter::SetLine(FVector start, FVector end) {
     lineDirection = lineEndPoint - lineStartPoint;
     lineDirection.Z = 0.0f;
     lineDirection.Normalize();
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
 }
 
 
