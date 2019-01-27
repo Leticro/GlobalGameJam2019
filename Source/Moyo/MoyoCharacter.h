@@ -43,6 +43,9 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Val);
 
+	void MoveRightCylinder(float Val);
+	void MoveRightLinear(float Val);
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
 	// End of APawn interface
@@ -58,7 +61,7 @@ protected:
 	void DashDown();
 	void DashUp();
 	void DashUpdate(float DeltaTime);
-	
+
 
 	virtual bool CanJumpInternal_Implementation() const override;
 
@@ -89,15 +92,16 @@ protected:
 	bool bSlingHeld;
 	FVector slingDir;
 	float slingMag;
-    
+
     // Movement Parameters
     bool isCylinder;
     float speed;
-    
+		float inputDir;
+
     // Cylinder
     FVector cylinderFocus;
     float cylinderRadius;
-    
+
     // Line
     FVector lineStartPoint;
     FVector lineEndPoint;
@@ -117,10 +121,10 @@ protected:
 
 public:
 	AMoyoCharacter();
-    
+
     // Sets Cylindrical Motion
     void SetCylinder(FVector center, float radius);
-    
+
     // Sets Linear Motion
     void SetLine(FVector start, FVector end);
 

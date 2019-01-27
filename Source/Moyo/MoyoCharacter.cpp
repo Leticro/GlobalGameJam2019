@@ -212,30 +212,45 @@ void AMoyoCharacter::SetLine(FVector start, FVector end) {
     lineDirection.Normalize();
 }
 
+
+
 void AMoyoCharacter::MoveRight(float Value)
 {
-    // Find new movement direction
-    FVector location = GetActorLocation();
+	inputDir = Value;
     
     if(isCylinder) { // --- Cylinder
-        float angle = speed * Value;
-        
-        FVector radius = location - cylinderFocus;
-        FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
-        
-        FVector tangent = newRadius - radius;
-        tangent.Normalize();
-        
-        float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle/2.0f)));
-        
-        // add movement in that direction
-        AddMovementInput(-tangent, distance);
-    }else{ // --- Line
-        
-        // add movement in the direction
-        AddMovementInput(-lineDirection, speed * Value);
+		MoveRightCylinder(Value);
+    
+	}else{ // --- Line
+		MoveRightLinear(Value);
         
     }
+}
+
+
+void AMoyoCharacter::MoveRightCylinder(float Value)
+{
+	// Find new movement direction
+	FVector location = GetActorLocation();
+
+	float angle = speed * Value;
+
+	FVector radius = location - cylinderFocus;
+	FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
+
+	FVector tangent = newRadius - radius;
+	tangent.Normalize();
+
+	float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle / 2.0f)));
+
+	// add movement in that direction
+	AddMovementInput(-tangent, distance);
+}
+
+void AMoyoCharacter::MoveRightLinear(float Value)
+{
+	// add movement in the direction
+	AddMovementInput(-lineDirection, speed * Value);
 }
 
 
