@@ -165,7 +165,6 @@ void AMoyoCharacter::Tick(float DeltaTime)
 	GlideUpdate(DeltaTime);
 
 	DashUpdate(DeltaTime);
-
 }
 
 
