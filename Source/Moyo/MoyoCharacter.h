@@ -31,6 +31,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void HandleDeath();
+
 	class AMoyoPlayerController* MoyoPlayerController;
 
 	virtual void BeginPlay() override;

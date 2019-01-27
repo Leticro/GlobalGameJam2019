@@ -27,8 +27,6 @@ public:
 	UFUNCTION()
 	void OnEndOverlap(AActor* MyOverlappedActor, AActor* OtherActor);
 
-	UFUNCTION(BlueprintCallable)
-		void Debug();
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

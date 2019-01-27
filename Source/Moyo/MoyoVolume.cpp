@@ -29,6 +29,18 @@ void AMoyoVolume::BeginPlay()
 	surfacedata.start = lineStart;
 	surfacedata.end = lineEnd;
 
+	TArray<AActor*> overlaps;
+	GetOverlappingActors(overlaps);
+	for (auto x : overlaps)
+	{
+		UActorComponent* OtherMotorComponent = x->GetComponentByClass(UMoyoMotor::StaticClass());
+		if (OtherMotorComponent)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Initial overlap %s with %s"), *GetName(), *x->GetName());
+		}
+		OnBeginOverlap(this, x);
+	}
+
 	OnActorBeginOverlap.AddDynamic(this, &AMoyoVolume::OnBeginOverlap);
 	OnActorEndOverlap.AddDynamic(this, &AMoyoVolume::OnEndOverlap);
 }
@@ -52,15 +64,4 @@ void AMoyoVolume::OnEndOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
 		UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
 		OtherMotor->RemoveSurface(surfacedata);
 	}
-}
-
-void AMoyoVolume::Debug()
-{
-
-	FTransform t = collider->GetComponentToWorld();
-	FVector a = lineStart;
-	FVector c = lineEnd;
-	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), a, 3.0f, FColor::Red, true, 3.0f);
-	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), c, 3.0f, FColor::Green, true, 3.0f);
-
 }

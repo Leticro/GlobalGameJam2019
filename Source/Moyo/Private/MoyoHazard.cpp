@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MoyoHazard.h"
+#include "MoyoCharacter.h"
 
 // Sets default values for this component's properties
 UMoyoHazard::UMoyoHazard()
@@ -31,3 +32,7 @@ void UMoyoHazard::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	// ...
 }
 
+void UMoyoHazard::HandleHit(AMoyoCharacter* Other)
+{
+	Other->HandleDeath();
+}

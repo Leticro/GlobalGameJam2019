@@ -16,14 +16,6 @@ void UMoyoMotor::BeginPlay()
 {
 	Super::BeginPlay();
     
-    // Hardcode to "Start to Island01"
-	isCylinder = false;
-    lineStartPoint = FVector(4200.0f, 1120.0f, 0.0f);
-    lineEndPoint = FVector(-20.0f, 1120.0f, 0.0f);
-    
-    lineDirection = lineEndPoint - lineStartPoint;
-    lineDirection.Z = 0.0f;
-    lineDirection.Normalize();
 }
 
 
@@ -32,9 +24,48 @@ void UMoyoMotor::TickComponent(float DeltaTime, enum ELevelTick TickType, FActor
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UMoyoMotor::ClampToCylinder()
+{
+	if (isCylinder)
+	{
+		FVector location = GetOwner()->GetActorLocation();
+		const FVector elevation = FVector(0.0f, 0.0f, location.Z);
+		location.Z = 0.0f;
+		FVector currentRadius = location - cylinderFocus;
+		currentRadius.Z = 0.0f;
+		currentRadius.Normalize();
+
+		FVector end = cylinderFocus + elevation + currentRadius * cylinderRadius;
+		GetOwner()->SetActorLocation(end);
+
+	}
+}
+
+FVector UMoyoMotor::GetForwardVector(float input) const
+{
+
+	FVector location = GetOwner()->GetActorLocation();
+	location.Z = 0.0f;
+	const FVector radius = location - cylinderFocus;
+	const FVector newRadius = radius.RotateAngleAxis(input, FVector(0.0f, 0.0f, 1.0f));
+
+	FVector tangent = newRadius - radius;
+	tangent.Z = 0;
+	tangent.Normalize();
+	return tangent;
+}
+
+float UMoyoMotor::GetForwardScalar(float input) const
+{
+	return 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(input / 2.0f)));
+}
 
 void UMoyoMotor::AssignSurface(FMoyoSurface surface)
 {
+	if (locked)
+	{
+		return;
+	}
 	stack.Add(surface);
 	stack.Sort([](const FMoyoSurface& lhs, const FMoyoSurface& rhs)
 	{
@@ -53,10 +84,18 @@ void UMoyoMotor::AssignSurface(FMoyoSurface surface)
 		lineDirection.Z = 0.0f;
 		lineDirection.Normalize();
 	}
+	if (onlyOneSurface)
+	{
+		locked = true;
+	}
 }
 
 void UMoyoMotor::RemoveSurface(FMoyoSurface surface)
 {
+	if (locked)
+	{
+		return;
+	}
 	int32 inpriority = surface.priority;
 	stack.RemoveAll([inpriority](const FMoyoSurface& lhs)
 	{

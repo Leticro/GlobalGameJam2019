@@ -5,8 +5,8 @@
 #include "Moyo.h"
 #include "MoyoMotor.generated.h"
 
-UCLASS()
-class UMoyoMotor : public UActorComponent
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
+class MOYO_API UMoyoMotor : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -21,33 +21,48 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AssignSurface(FMoyoSurface InSurface);
 
-
 	UFUNCTION(BlueprintCallable)
 	void RemoveSurface(FMoyoSurface surface);
+
+	UFUNCTION(BlueprintCallable)
+	void ClampToCylinder();
+
+	UFUNCTION(BlueprintPure)
+	FVector GetForwardVector(float speed) const;
+
+	UFUNCTION(BlueprintPure)
+	float GetForwardScalar(float speed) const;
 
 	UPROPERTY()
 	TArray<FMoyoSurface> stack;
 
 	// Movement Parameters
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	bool isCylinder;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float speed;
 
 
 	// Cylinder
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	FVector cylinderFocus;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	float cylinderRadius;
 
 	// Line
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	FVector lineStartPoint;
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	FVector lineEndPoint;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UPROPERTY(VisibleAnywhere)
 	FVector lineDirection;
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	bool onlyOneSurface;
+
+
+	UPROPERTY(VisibleAnywhere)
+	bool locked;
+
+
 };
