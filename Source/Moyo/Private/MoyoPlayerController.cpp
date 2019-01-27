@@ -30,8 +30,8 @@ void AMoyoPlayerController::MoveRight(float Val)
 
 AMoyoPlayerController::AMoyoPlayerController()
 {
-    InventorySlotLimit = 50;
-    InventoryWeightLimit = 500;
+    InventorySlotLimit = 1;
+    InventoryWeightLimit = 3;
 }
 
 int32 AMoyoPlayerController::GetInventoryWeight()
@@ -73,7 +73,14 @@ void AMoyoPlayerController::SetupInputComponent()
 
 void AMoyoPlayerController::Interact()
 {
-    if(CurrentInteractable)
+    // inventory full
+    if(Inventory.Num())
+    {
+        //UE_LOG(LogTemp, Warning, TEXT("ITEM: %s"), Inventory[0].Name);
+        // drop item
+        Inventory.Pop();
+    }
+    else if(CurrentInteractable)
     {
         CurrentInteractable->Interact(this);
     }
