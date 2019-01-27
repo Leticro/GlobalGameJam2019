@@ -98,11 +98,6 @@ FVector UMoyoMotor::GetForwardVector(float input)
 
 				location = ownerActor->GetActorLocation();
 				location.Z = 0.0f;
-				const float ToStart = FVector::Dist2D(location, lineStartPoint);
-				if (ToStart > LineLength)
-				{
-					location = FVector::ZeroVector;
-				}
 			}
 			else if (ToEnd > LineLength)
 			{
@@ -113,11 +108,6 @@ FVector UMoyoMotor::GetForwardVector(float input)
 
 				location = ownerActor->GetActorLocation();
 				location.Z = 0.0f;
-				const float ToEnd = FVector::Dist2D(location, lineEndPoint);
-				if (ToEnd > LineLength)
-				{
-					location = FVector::ZeroVector;
-				}
 			}
 			return boundDirection;
 		}
