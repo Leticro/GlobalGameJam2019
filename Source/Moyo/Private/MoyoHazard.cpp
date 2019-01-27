@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "MoyoHazard.h"
+#include "MoyoCharacter.h"
 
 // Sets default values for this component's properties
 UMoyoHazard::UMoyoHazard()
@@ -9,7 +10,11 @@ UMoyoHazard::UMoyoHazard()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	FAttachmentTransformRules rules = FAttachmentTransformRules(EAttachmentRule::KeepRelative, false);
+
+	collider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Cap"));
+	collider->SetCapsuleSize(200.0f, 200.0f, 1.0f);
+	collider->AttachToComponent(this, rules);
 }
 
 
@@ -18,7 +23,7 @@ void UMoyoHazard::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	collider->OnComponentBeginOverlap.AddDynamic(this, &UMoyoHazard::OnBeginOverlap);
 	
 }
 
@@ -31,3 +36,11 @@ void UMoyoHazard::TickComponent(float DeltaTime, ELevelTick TickType, FActorComp
 	// ...
 }
 
+void UMoyoHazard::OnBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AMoyoCharacter* Other = Cast<AMoyoCharacter>(OtherActor);
+	if (Other)
+	{
+		Other->DoDeath();
+	}
+}

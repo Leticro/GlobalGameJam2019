@@ -4,24 +4,21 @@
 
 #include "Moyo.h"
 #include "MoyoTypes.h"
+#include "MoyoGuy.h"
+#include "Engine.h"
 #include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "MoyoCharacter.generated.h"
 
-class UMoyoCharacterMovementComponent;
-class UMoyoMotor;
 
-UCLASS(config=Game)
-class AMoyoCharacter : public ACharacter
+UCLASS()
+class AMoyoCharacter : public AMoyoGuy
 {
 	GENERATED_BODY()
 
 public:
 	AMoyoCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-
-	// Custom Character Movement Component
-	UMoyoCharacterMovementComponent* MoyoCharMovementComp;
-
+	
 
 	/** Side view camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -30,6 +27,13 @@ public:
 	/** Camera boom positioning the camera beside the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+
+    /** Pickup collection sphere */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+        class USphereComponent* CollectionSphere;
+
+    UPROPERTY(EditAnywhere)
+        float CollectionSphereRadius = 150.0f;
 
 	class AMoyoPlayerController* MoyoPlayerController;
 
@@ -41,11 +45,6 @@ public:
 
 protected:
 
-	/** Called for side to side input */
-	void MoveRight(float Val);
-
-	void MoveRightCylinder(float Val);
-	void MoveRightLinear(float Val);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -67,7 +66,9 @@ protected:
 	virtual bool CanJumpInternal_Implementation() const override;
 
 	bool LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result);
-
+    
+    /** Function to check for the closest Interactable in sight and in range. */
+    void CheckForInteractables();
 
 public:
 	// Sling fields
@@ -89,8 +90,9 @@ public:
 		float dashCurveExponent = 1.0f;
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UMoyoMotor* motor;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MoyoCharacter)
+	float glideAmount;
 
 protected:
 
@@ -102,13 +104,17 @@ protected:
 
     // Movement Parameters
     float speed;
-		float inputDir;
+	float inputDir;
 	// Hover fields
 	UPROPERTY(EditAnywhere)
-	float glideGravityScale = 1.f;
+	float glideGravityScale = 1.0f;
 	float gravityScaleTarget;
+	float glideIntention;
 	float defaultGravityScale;
 	FFloatSpringState hoverSpringState;
+	
+	
+
 
 	// Dash fields
 	float dashDirection;
@@ -120,6 +126,7 @@ protected:
 public:
 	AMoyoCharacter();
 
+	
     
 
 	/** Returns SideViewCameraComponent subobject **/

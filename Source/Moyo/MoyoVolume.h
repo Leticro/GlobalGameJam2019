@@ -27,8 +27,6 @@ public:
 	UFUNCTION()
 	void OnEndOverlap(AActor* MyOverlappedActor, AActor* OtherActor);
 
-	UFUNCTION(BlueprintCallable)
-		void Debug();
 
 public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -36,6 +34,9 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UCapsuleComponent* collider;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TArray<TSubclassOf<AActor>> acceptedClasses;
 
 	UPROPERTY(VisibleAnywhere)
 	FMoyoSurface surfacedata;

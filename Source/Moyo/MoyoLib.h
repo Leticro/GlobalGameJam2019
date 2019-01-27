@@ -14,5 +14,7 @@ class UMoyoLib : public UBlueprintFunctionLibrary
 
 public:
 
-	static FVector VectorFromRadians();
+	
+	UFUNCTION(BlueprintCallable)
+	static FVector GetMoveDestination(float DeltaTime, AActor* Actor, float MoveSpeed, UMoyoMotor* Motor);
 };
