@@ -222,11 +222,11 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 			//float value = (dashVel * dashDirection) / speed;
 			//UE_LOG(LogTemp, Warning, TEXT("dashVel: %f, dashDir: %f, speed: %f, value: %f"), dashVel, dashDirection, speed, value);
 			
-			if (isCylinder)
+			if (motor->isCylinder)
 			{
-				float angle = -dashPosDelta * (180.f / (cylinderRadius * 3.14159265f));
-				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - cylinderFocus);
-				SetActorLocation(cylinderFocus + relativePos);
+				float angle = -dashPosDelta * (180.f / (motor->cylinderRadius * 3.14159265f));
+				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - motor->cylinderFocus);
+				SetActorLocation(motor->cylinderFocus + relativePos);
 
 				// Just so we "Run" and face the dash direction
 				MoveRightCylinder(dashDirection);
