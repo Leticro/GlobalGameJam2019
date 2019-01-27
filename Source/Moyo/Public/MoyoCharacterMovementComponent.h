@@ -16,11 +16,12 @@ class MOYO_API UMoyoCharacterMovementComponent : public UCharacterMovementCompon
 	
 public:
 	
+	UFUNCTION(BlueprintCallable, Category = "Pawn|Components|CharacterMovement")
+	bool IsNearingGround(float nearDistance) const;
 
 	virtual void InitializeComponent() override;
 
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
-	
 	
 	virtual bool DoJump(bool bReplayingMoves) override;
 
