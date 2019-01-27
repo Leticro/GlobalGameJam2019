@@ -8,6 +8,7 @@
 UENUM(BlueprintType)
 enum class EMoyoGameState : uint8
 {
+	NONE,
 	INTRO,
 	DIALOG,
 	PLAY,
@@ -15,48 +16,37 @@ enum class EMoyoGameState : uint8
 	FINISH
 };
 
-
 USTRUCT(BlueprintType)
-struct FMoyoCylinder
+struct FMoyoSurface
 {
 	GENERATED_BODY()
 
-	FMoyoCylinder()
+	FMoyoSurface()
 	{
-		isValid = false;
+		priority = -1;
+		isCylinder = true;
 		center = FVector::ZeroVector;
-		radius = -1.0f;
-	}
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool isValid;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector center;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float radius;
-};
-
-
-USTRUCT(BlueprintType)
-struct FMoyoLinear
-{
-	GENERATED_BODY()
-
-	FMoyoLinear()
-	{
-		isValid = false;
+		radius = 1000.0f;
 		start = FVector::ZeroVector;
 		end = FVector::ZeroVector;
 	}
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	bool isValid;
+		int32 priority;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector start;
+		bool isCylinder;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	FVector end;
+		FVector center;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		float radius;
+
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FVector start;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		FVector end;
 };

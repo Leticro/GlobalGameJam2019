@@ -3,6 +3,7 @@
 #include "MoyoVolume.h"
 #include "MoyoMotor.h"
 #include "UObject/ConstructorHelpers.h"
+#include "DrawDebugHelpers.h"
 #include "MoyoCharacter.h"
 
 AMoyoVolume::AMoyoVolume(const FObjectInitializer& ObjectInitializer) 
@@ -13,73 +14,53 @@ AMoyoVolume::AMoyoVolume(const FObjectInitializer& ObjectInitializer)
 	collider = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Cap"));
 	collider->SetCapsuleSize(800.0f,800.0f,1.0f);
 	collider->AttachToComponent(root, rules);
-
-	anchorLeft = CreateDefaultSubobject<USceneComponent>(TEXT("Left"));
-	anchorLeft->AttachToComponent(root, rules);
-	anchorLeft->SetRelativeLocation(FVector::ForwardVector*100.0f);
-	iconLeft = CreateDefaultSubobject<UBillboardComponent>(TEXT("IconLeft"));
-	iconLeft->AttachToComponent(anchorLeft, rules);
-
-	anchorRight = CreateDefaultSubobject<USceneComponent>(TEXT("Right"));
-	anchorRight->AttachToComponent(root, rules);
-	anchorRight->SetRelativeLocation(-FVector::ForwardVector*100.0f);
-	iconRight = CreateDefaultSubobject<UBillboardComponent>(TEXT("IconRight"));
-	iconRight->AttachToComponent(anchorRight, rules);
-
-
-	if (iconLeft != nullptr)
-	{
-		// Structure to hold one-time initialization
-		struct FConstructorStatics
-		{
-			ConstructorHelpers::FObjectFinderOptional<UTexture2D> SpriteTexture;
-			FName ID_Info;
-			FText NAME_Info;
-			FConstructorStatics()
-				: SpriteTexture(TEXT("/Engine/EditorResources/S_KPrismatic"))
-				, ID_Info(TEXT("Info"))
-				, NAME_Info(NSLOCTEXT("SpriteCategory", "Info", "Info"))
-			{
-			}
-		};
-		static FConstructorStatics ConstructorStatics;
-
-		iconLeft->Sprite = ConstructorStatics.SpriteTexture.Get();
-		iconLeft->SpriteInfo.Category = ConstructorStatics.ID_Info;
-		iconLeft->SpriteInfo.DisplayName = ConstructorStatics.NAME_Info;
-		iconLeft->bIsScreenSizeScaled = true;
-
-
-		iconRight->Sprite = ConstructorStatics.SpriteTexture.Get();
-		iconRight->SpriteInfo.Category = ConstructorStatics.ID_Info;
-		iconRight->SpriteInfo.DisplayName = ConstructorStatics.NAME_Info;
-		iconRight->bIsScreenSizeScaled = true;
-
-	}
-
 }
 	
 
 void AMoyoVolume::BeginPlay()
 {
-	TArray<AActor*> otherList;
-	GetOverlappingActors(otherList);
-	for (auto other : otherList)
+	surfacedata.priority = priority;
+	surfacedata.isCylinder = lineLength < 1.0f;
+	
+	surfacedata.center = collider->GetComponentLocation();
+	surfacedata.center.Z = 0.0f;
+	surfacedata.radius = cylinderRadius;
+	FTransform t = collider->GetComponentToWorld();
+	surfacedata.start = collider->GetComponentLocation() + lineLength * t.GetRotation().GetUpVector();
+	surfacedata.end = collider->GetComponentLocation() - lineLength * t.GetRotation().GetUpVector();
+
+	OnActorBeginOverlap.AddDynamic(this, &AMoyoVolume::OnBeginOverlap);
+	OnActorEndOverlap.AddDynamic(this, &AMoyoVolume::OnEndOverlap);
+}
+
+void AMoyoVolume::OnBeginOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
+{
+	UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
+	if (OtherMotorComponent)
 	{
-		OnOverlap(this, other);
+		UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
+		OtherMotor->AssignSurface(surfacedata);
 	}
 }
 
-void AMoyoVolume::OnOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
+void AMoyoVolume::OnEndOverlap(AActor* MyOverlappedActor, AActor* OtherActor)
 {
-	cylinder.center = collider->GetComponentLocation();
-	linear.start = anchorLeft->GetComponentLocation();
-	linear.end = anchorRight->GetComponentLocation();
 
 	UActorComponent* OtherMotorComponent = OtherActor->GetComponentByClass(UMoyoMotor::StaticClass());
 	if (OtherMotorComponent)
 	{
 		UMoyoMotor* OtherMotor = Cast<UMoyoMotor>(OtherMotorComponent);
-		OtherMotor->AssignSurface(cylinder, linear);
+		OtherMotor->RemoveSurface(surfacedata);
 	}
+}
+
+void AMoyoVolume::Debug()
+{
+
+	FTransform t = collider->GetComponentToWorld();
+	FVector a = collider->GetComponentLocation() + lineLength * t.GetRotation().GetUpVector();
+	FVector c = collider->GetComponentLocation() - 2.0f*lineLength * t.GetRotation().GetUpVector();
+	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), a, 3.0f, FColor::Red, true, 3.0f);
+	DrawDebugDirectionalArrow(GetWorld(), collider->GetComponentLocation(), c, 3.0f, FColor::Green, true, 3.0f);
+
 }

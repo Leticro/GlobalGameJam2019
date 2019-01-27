@@ -30,23 +30,49 @@ void UMoyoMotor::TickComponent(float DeltaTime, enum ELevelTick TickType, FActor
 }
 
 
-void UMoyoMotor::AssignSurface(FMoyoCylinder cylinder, FMoyoLinear linear)
+void UMoyoMotor::AssignSurface(FMoyoSurface surface)
 {
-	if (cylinder.isValid)
+	stack.Add(surface);
+	stack.Sort([](const FMoyoSurface& lhs, const FMoyoSurface& rhs)
 	{
-		isCylinder = true;
+		return lhs.priority > rhs.priority;
+	});
 
-		cylinderFocus = cylinder.center;
-		cylinderRadius = cylinder.radius;
-	}
-	else
+ 	isCylinder = stack[0].isCylinder;
+
+	cylinderFocus = stack[0].center;
+	cylinderRadius = stack[0].radius;
+	lineStartPoint = stack[0].start;
+	lineEndPoint = stack[0].end;
+	if(!isCylinder)
 	{
-		isCylinder = false;
-
-		lineStartPoint = linear.start;
-		lineEndPoint = linear.end;
 		lineDirection = lineEndPoint - lineStartPoint;
 		lineDirection.Z = 0.0f;
 		lineDirection.Normalize();
+	}
+}
+
+void UMoyoMotor::RemoveSurface(FMoyoSurface surface)
+{
+	int32 inpriority = surface.priority;
+	stack.RemoveAll([inpriority](const FMoyoSurface& lhs)
+	{
+		return lhs.priority == inpriority;
+	});
+
+ 	if (stack.Num() > 0)
+	{
+		isCylinder = stack[0].isCylinder;
+
+		cylinderFocus = stack[0].center;
+		cylinderRadius = stack[0].radius;
+		lineStartPoint = stack[0].start;
+		lineEndPoint = stack[0].end;
+		if (!isCylinder)
+		{
+			lineDirection = lineEndPoint - lineStartPoint;
+			lineDirection.Z = 0.0f;
+			lineDirection.Normalize();
+		}
 	}
 }
