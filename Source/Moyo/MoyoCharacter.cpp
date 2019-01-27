@@ -78,7 +78,10 @@ void AMoyoCharacter::BeginPlay()
 	bSlingHeld = false;
 	defaultGravityScale = MoyoCharMovementComp->GravityScale;
 	gravityScaleTarget = defaultGravityScale;
-    
+	
+	hoverSpringState.Velocity = 0.f;
+	hoverSpringState.PrevError = 0.f;
+
     speed = 24.0f;
 	
 	inputDir = 1.0f;
@@ -192,16 +195,24 @@ void AMoyoCharacter::SlingUpdateTrajectory(float DeltaTime)
 
 void AMoyoCharacter::GlideUpdate(float DeltaTime)
 {
-	//UKismetMathLibrary::FloatSpringInterp(MoyoCharMovementComp->GravityScale, gravityScaleTarget, hoverSpringState, 100.f, 0.0f, DeltaTime);
+	//glideAmount = UKismetMathLibrary::FloatSpringInterp(glideAmount, glideIntention, hoverSpringState, 100.f, 0.5f, DeltaTime);
+	glideAmount = FMath::FInterpTo(glideAmount, glideIntention, DeltaTime, 10.0f);
+
 	if (MoyoCharMovementComp->Velocity.Z < 0.f)
 	{
-		MoyoCharMovementComp->GravityScale = gravityScaleTarget;
+		//MoyoCharMovementComp->GravityScale = UKismetMathLibrary::FloatSpringInterp(MoyoCharMovementComp->GravityScale, gravityScaleTarget, hoverSpringState, 100.f, 0.5f, DeltaTime);
+		MoyoCharMovementComp->GravityScale = (defaultGravityScale - glideGravityScale) * (1.0f - glideAmount) + glideGravityScale;
+		
+
+		//glideAmount = 1.0f - (MoyoCharMovementComp->GravityScale - glideGravityScale) / 
+		//MoyoCharMovementComp->GravityScale = FMath::FInterpTo(MoyoCharMovementComp->GravityScale, gravityScaleTarget, DeltaTime, 100.0f);
+		//MoyoCharMovementComp->GravityScale = gravityScaleTarget;
 	}
 	else
 	{
 		MoyoCharMovementComp->GravityScale = defaultGravityScale;
 	}
-	//UE_LOG(LogTemp, Warning, TEXT("GravityScale: %f"), MoyoCharMovementComp->GravityScale);
+	UE_LOG(LogTemp, Warning, TEXT("GlideAmount: %f, GravityScale: %f"), glideAmount, MoyoCharMovementComp->GravityScale);
 }
 
 
@@ -340,11 +351,13 @@ void AMoyoCharacter::SlingUp()
 void AMoyoCharacter::GlideDown()
 {
 	gravityScaleTarget = glideGravityScale;
+	glideIntention = 1.0f;
 }
 
 void AMoyoCharacter::GlideUp()
 {
 	gravityScaleTarget = defaultGravityScale;
+	glideIntention = 0.0f;
 }
 
 void AMoyoCharacter::DashDown()

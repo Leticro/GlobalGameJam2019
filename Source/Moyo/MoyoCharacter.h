@@ -92,6 +92,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UMoyoMotor* motor;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MoyoCharacter)
+	float glideAmount;
+
 protected:
 
 
@@ -102,13 +105,17 @@ protected:
 
     // Movement Parameters
     float speed;
-		float inputDir;
+	float inputDir;
 	// Hover fields
 	UPROPERTY(EditAnywhere)
 	float glideGravityScale = 1.f;
 	float gravityScaleTarget;
+	float glideIntention;
 	float defaultGravityScale;
 	FFloatSpringState hoverSpringState;
+	
+	
+
 
 	// Dash fields
 	float dashDirection;
@@ -120,6 +127,7 @@ protected:
 public:
 	AMoyoCharacter();
 
+	
     
 
 	/** Returns SideViewCameraComponent subobject **/
