@@ -86,8 +86,6 @@ public:
 	UPROPERTY(EditAnywhere)
 		float dashCurveExponent = 1.0f;
 
-
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MoyoCharacter)
 	float glideAmount;
 
