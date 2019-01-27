@@ -31,8 +31,8 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bDoCollisionTest = false;
-	CameraBoom->TargetArmLength = 500.f;
-	CameraBoom->SocketOffset = FVector(0.f, 0.f, 75.f);
+	CameraBoom->TargetArmLength = 800.f;
+	CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
 	CameraBoom->RelativeRotation = FRotator(0.f, 180.f, 0.f);
 
 	// Create a camera and attach to boom
@@ -73,11 +73,20 @@ void AMoyoCharacter::BeginPlay()
 	gravityScaleTarget = defaultGravityScale;
     
     speed = 24.0f;
-    cameraDistance = 75.0f;
     
     // TEMP
-    SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
-    //SetLine(FVector(1200.0f, 20.0f, 0.0f), FVector(1800.0f, 50.0f, 0.0f));
+    
+    // Start to Island 01
+    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
+    
+    // Island 01
+    //SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
+    
+    // Island 01 to Island 02
+    //SetLine(FVector(-792.0f, 792.0f, 0.0f), FVector(-4200.0f, -3000.0f, 0.0f));
+    
+    // Island 02
+    SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
 }
 
 // Called every frame
@@ -98,6 +107,8 @@ void AMoyoCharacter::Tick(float DeltaTime)
         SetActorLocation(cylinderFocus + elevation + currentRadius * cylinderRadius);
         
         // Camera Position/Rotation
+        //currentRadius.Z = 0.8f;
+        //currentRadius.Normalize();
         CameraBoom->SetWorldRotation((-currentRadius).Rotation());
         
     }else{ // --- Line
@@ -240,6 +251,7 @@ void AMoyoCharacter::SetCylinder(FVector center, float radius) {
     
     cylinderFocus = center;
     cylinderRadius = radius;
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
 }
 
 void AMoyoCharacter::SetLine(FVector start, FVector end) {
@@ -250,6 +262,7 @@ void AMoyoCharacter::SetLine(FVector start, FVector end) {
     lineDirection = lineEndPoint - lineStartPoint;
     lineDirection.Z = 0.0f;
     lineDirection.Normalize();
+    CameraBoom->SocketOffset = FVector(0.f, 0.f, 25.f);
 }
 
 
