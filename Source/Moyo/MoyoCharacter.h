@@ -5,6 +5,8 @@
 #include "Moyo.h"
 #include "MoyoTypes.h"
 #include "MoyoGuy.h"
+#include "Engine.h"
+#include "GameFramework/Character.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "MoyoCharacter.generated.h"
 
@@ -25,6 +27,13 @@ public:
 	/** Camera boom positioning the camera beside the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
+
+    /** Pickup collection sphere */
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+        class USphereComponent* CollectionSphere;
+
+    UPROPERTY(EditAnywhere)
+        float CollectionSphereRadius = 150.0f;
 
 	class AMoyoPlayerController* MoyoPlayerController;
 
@@ -57,7 +66,9 @@ protected:
 	virtual bool CanJumpInternal_Implementation() const override;
 
 	bool LinePlaneIntersection(const FVector& planePoint, const FVector& planeNormal, const FVector& linePoint, const FVector& lineDirection, FVector& result);
-
+    
+    /** Function to check for the closest Interactable in sight and in range. */
+    void CheckForInteractables();
 
 public:
 	// Sling fields
@@ -90,7 +101,7 @@ protected:
 
 	// Hover fields
 	UPROPERTY(EditAnywhere)
-	float glideGravityScale = 1.f;
+	float glideGravityScale = 1.0f;
 	float gravityScaleTarget;
 	float defaultGravityScale;
 	FFloatSpringState hoverSpringState;
