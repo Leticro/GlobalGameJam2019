@@ -3,16 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Moyo.h"
+#include "MoyoTypes.h"
 #include "GameFramework/GameModeBase.h"
 #include "MoyoGameMode.generated.h"
 
-UCLASS(minimalapi)
+UCLASS()
 class AMoyoGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
 	AMoyoGameMode();
+
 };
 
 

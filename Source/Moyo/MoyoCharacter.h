@@ -2,11 +2,14 @@
 
 #pragma once
 
-#include "CoreMinimal.h"
+#include "Moyo.h"
+#include "MoyoTypes.h"
 #include "GameFramework/Character.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "MoyoCharacter.generated.h"
 
 class UMoyoCharacterMovementComponent;
+class UMoyoMotor;
 
 UCLASS(config=Game)
 class AMoyoCharacter : public ACharacter
@@ -41,11 +44,8 @@ protected:
 	/** Called for side to side input */
 	void MoveRight(float Val);
 
-	/** Handle touch inputs. */
-	void TouchStarted(const ETouchIndex::Type FingerIndex, const FVector Location);
-
-	/** Handle touch stop event. */
-	void TouchStopped(const ETouchIndex::Type FingerIndex, const FVector Location);
+	void MoveRightCylinder(float Val);
+	void MoveRightLinear(float Val);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* InputComponent) override;
@@ -55,6 +55,14 @@ protected:
 	void SlingUp();
 	void SlingUpdateTrajectory(float DeltaTime);
 
+	void GlideDown();
+	void GlideUp();
+	void GlideUpdate(float DeltaTime);
+
+	void DashDown();
+	void DashUp();
+	void DashUpdate(float DeltaTime);
+
 
 	virtual bool CanJumpInternal_Implementation() const override;
 
@@ -62,6 +70,7 @@ protected:
 
 
 public:
+	// Sling fields
 	UPROPERTY(EditAnywhere)
 	float minSlingRadius = 50.f;
 	UPROPERTY(EditAnywhere)
@@ -71,18 +80,47 @@ public:
 	UPROPERTY(EditAnywhere)
 	float maxSlingVelocity = 200.f;
 
+	// Dash fields
+	UPROPERTY(EditAnywhere)
+		float dashDuration = 0.5f;
+	UPROPERTY(EditAnywhere)
+		float dashDistance = 100.0f;
+	UPROPERTY(EditAnywhere)
+		float dashCurveExponent = 1.0f;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMoyoMotor* motor;
 
 protected:
 
-	// Sling Parameters
+
+	// Sling fields
 	bool bSlingHeld;
 	FVector slingDir;
 	float slingMag;
 
+    // Movement Parameters
+    float speed;
+		float inputDir;
+	// Hover fields
+	UPROPERTY(EditAnywhere)
+	float glideGravityScale = 1.f;
+	float gravityScaleTarget;
+	float defaultGravityScale;
+	FFloatSpringState hoverSpringState;
+
+	// Dash fields
+	float dashDirection;
+	float dashStartTime;
+	float dashPrevPos;
+	bool bDashAvailable;
+	bool bDashing;
 
 public:
 	AMoyoCharacter();
+
+    
 
 	/** Returns SideViewCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetSideViewCameraComponent() const { return SideViewCameraComponent; }
