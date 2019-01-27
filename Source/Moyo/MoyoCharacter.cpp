@@ -281,22 +281,39 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 
 void AMoyoCharacter::CheckForInteractables()
 {
-    // Get all overlapping Actors and store them in an array
-    TArray<AActor*> CollectedActors;
-    CollectionSphere->GetOverlappingActors(CollectedActors);
 
     AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
 
-    // For each collected Actor
-    for(int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+    if(IController->Inventory.Num())
     {
-        // Cast the actor to AInteractable
-        AInteractable* Interactable = Cast<AInteractable>(CollectedActors[iCollected]);
-        // If the cast is successful
-        if(Interactable)
+        FVector playerLoc = GetActorLocation();
+        playerLoc.Z += 100;
+        IController->CurrentObject->SetActorLocation(playerLoc);
+    }
+    else if(IController->CurrentObject)
+    {
+        FVector forward = GetActorLocation() + CameraBoom->GetForwardVector() * 80.0f;
+
+        IController->CurrentObject->SetActorLocation(forward);
+        IController->CurrentObject = nullptr;
+
+    } else
+    {
+        // Get all overlapping Actors and store them in an array
+        TArray<AActor*> CollectedActors;
+        CollectionSphere->GetOverlappingActors(CollectedActors);
+
+        // For each collected Actor
+        for(int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
         {
-            IController->CurrentInteractable = Interactable;
-            return;
+            // Cast the actor to AInteractable
+            AInteractable* Interactable = Cast<AInteractable>(CollectedActors[iCollected]);
+            // If the cast is successful
+            if(Interactable)
+            {
+                IController->CurrentInteractable = Interactable;
+                return;
+            }
         }
     }
     IController->CurrentInteractable = nullptr;

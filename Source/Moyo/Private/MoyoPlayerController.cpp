@@ -76,9 +76,9 @@ void AMoyoPlayerController::Interact()
     // inventory full
     if(Inventory.Num())
     {
-        //UE_LOG(LogTemp, Warning, TEXT("ITEM: %s"), Inventory[0].Name);
-        // drop item
+        // drop object
         Inventory.Pop();
+        
     }
     else if(CurrentInteractable)
     {

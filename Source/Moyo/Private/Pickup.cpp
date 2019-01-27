@@ -23,5 +23,6 @@ void APickup::Interact_Implementation(APlayerController* Controller)
     {
         UE_LOG(LogTemp, Warning, TEXT("PICKUP"));
         // Play animation and attach to hand
+        IController->CurrentObject = this;
     }
 }
