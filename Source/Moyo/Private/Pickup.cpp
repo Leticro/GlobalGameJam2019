@@ -13,9 +13,9 @@ APickup::APickup()
     Super::Action = "Pickup";
 }
 
-void APickup::Interact_Implementation(APlayerController* Controller)
+void APickup::Interact_Implementation(APlayerController* Controller, AMoyoCharacter* Character)
 {
-    Super::Interact_Implementation(Controller);
+    Super::Interact_Implementation(Controller, Character);
 
     AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(Controller);
 
