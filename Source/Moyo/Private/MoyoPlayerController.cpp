@@ -76,8 +76,9 @@ void AMoyoPlayerController::Interact()
     // inventory full
     if(Inventory.Num())
     {
+        // drop object
         Inventory.Pop();
-        CurrentObject = nullptr;
+        
     }
     else if(CurrentInteractable)
     {

@@ -281,16 +281,21 @@ void AMoyoCharacter::CheckForInteractables()
     if(IController->Inventory.Num())
     {
         FVector playerLoc = GetActorLocation();
-        playerLoc.Z += 150;
+        playerLoc.Z += 100;
         IController->CurrentObject->SetActorLocation(playerLoc);
     }
-    else
+    else if(IController->CurrentObject)
+    {
+        FVector forward = GetActorLocation() + CameraBoom->GetForwardVector() * 80.0f;
+
+        IController->CurrentObject->SetActorLocation(forward);
+        IController->CurrentObject = nullptr;
+
+    } else
     {
         // Get all overlapping Actors and store them in an array
         TArray<AActor*> CollectedActors;
         CollectionSphere->GetOverlappingActors(CollectedActors);
-
-        //AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
 
         // For each collected Actor
         for(int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
@@ -304,8 +309,8 @@ void AMoyoCharacter::CheckForInteractables()
                 return;
             }
         }
-        IController->CurrentInteractable = nullptr;
     }
+    IController->CurrentInteractable = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////
