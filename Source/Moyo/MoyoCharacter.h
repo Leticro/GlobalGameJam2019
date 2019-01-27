@@ -85,6 +85,8 @@ public:
 		float dashDuration = 0.5f;
 	UPROPERTY(EditAnywhere)
 		float dashDistance = 100.0f;
+	UPROPERTY(EditAnywhere)
+		float dashCurveExponent = 1.0f;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -112,6 +114,9 @@ protected:
 	//float dashTimestepAccumulator;
 	float dashDirection;
 	float dashStartTime;
+	float dashPrevPos;
+	bool bDashAvailable;
+	bool bDashing;
 
 public:
 	AMoyoCharacter();

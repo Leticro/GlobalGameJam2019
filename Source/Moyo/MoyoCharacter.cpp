@@ -8,6 +8,7 @@
 #include "Components/InputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Engine/World.h"
 
 #include "Moyo/Public/MoyoCharacterMovementComponent.h"
 #include "Moyo/Public/MoyoPlayerController.h"
@@ -87,14 +88,29 @@ void AMoyoCharacter::BeginPlay()
     
     
     // Island 01 to Island 02
-    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
+    //SetLine(FVector(-792.0f, 792.0f, 0.0f), FVector(-4200.0f, -3000.0f, 0.0f));
+    
+    // Island 02
+    //SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
+    
+    // Island 02 to Island 03
+    //SetLine(FVector(4500.0f, -3380.0f, 0.0f), FVector(-3200.0f, -2600.0f, 0.0f));
+    
+    // Island 03
+    //SetCylinder(FVector(4500.0f, -4500.0f, 0.0f), 1120.0f);
+    
+    // Island 03 to Island 04
+    //SetLine(FVector(3910.0f, -10.0f, 0.0f), FVector(3370.0f, -4380.0f, 0.0f));
+    
+    // Island 04
+    //SetCylinder(FVector(4900.0f, 0.0f, 0.0f), 1000.0f);
 }
 
 // Called every frame
 void AMoyoCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-    
+
     // Correct location if outside rails
     FVector location = GetActorLocation();
     FVector elevation = FVector(0.0f, 0.0f, location.Z);
@@ -137,9 +153,10 @@ void AMoyoCharacter::Tick(float DeltaTime)
 		//Disabled for now 
 		//SlingUpdateTrajectory(DeltaTime);
 	}
-
+	
 	GlideUpdate(DeltaTime);
 
+	DashUpdate(DeltaTime);
 
 }
 
@@ -182,17 +199,56 @@ void AMoyoCharacter::GlideUpdate(float DeltaTime)
 	{
 		MoyoCharMovementComp->GravityScale = defaultGravityScale;
 	}
-	UE_LOG(LogTemp, Warning, TEXT("GravityScale: %f"), MoyoCharMovementComp->GravityScale);
+	//UE_LOG(LogTemp, Warning, TEXT("GravityScale: %f"), MoyoCharMovementComp->GravityScale);
 }
 
 
 void AMoyoCharacter::DashUpdate(float DeltaTime)
 {
+	if (bDashing)
+	{
+		float t = (GetWorld()->TimeSeconds - dashStartTime) / dashDuration;
+		if (t > 1.f)
+		{
+			bDashing = false;
+		}
+		else
+		{
 
+			float dashNextPos = FMath::InterpEaseOut(0.0f, dashDistance, t, dashCurveExponent);
+			float dashPosDelta = (dashNextPos - dashPrevPos) * dashDirection;
 
+			//float dashVel = dashPosDelta / DeltaTime;
+			//float value = (dashVel * dashDirection) / speed;
+			//UE_LOG(LogTemp, Warning, TEXT("dashVel: %f, dashDir: %f, speed: %f, value: %f"), dashVel, dashDirection, speed, value);
+			
+			if (isCylinder)
+			{
+				float angle = -dashPosDelta * (180.f / (cylinderRadius * 3.14159265f));
+				FVector relativePos = FQuat(FVector(0.f, 0.f, 1.f), FMath::DegreesToRadians(angle)) * (GetActorLocation() - cylinderFocus);
+				SetActorLocation(cylinderFocus + relativePos);
 
+				// Just so we "Run" and face the dash direction
+				MoveRightCylinder(dashDirection);
+			}
+			else
+			{ 
+				// Linear not implemented yet
 
-	
+				// Just so we "Run" and face the dash direction
+				MoveRightLinear(dashDirection);
+			}
+			dashPrevPos = dashNextPos;
+		}
+
+	}
+	else
+	{
+		if (!MoyoCharMovementComp->IsFalling())
+		{
+			bDashAvailable = true;
+		}
+	}
 }
 
 
@@ -218,7 +274,8 @@ void AMoyoCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInpu
 
 void AMoyoCharacter::MoveRight(float Value)
 {
-	inputDir = Value;
+	if (Value != 0)
+		inputDir = Value;
     
     if(motor->isCylinder) { // --- Cylinder
 		MoveRightCylinder(Value);
@@ -246,6 +303,8 @@ void AMoyoCharacter::MoveRightCylinder(float Value)
 	float distance = 10.0f * FMath::Abs(FMath::Sin(FMath::DegreesToRadians(angle / 2.0f)));
 
 	// add movement in that direction
+	
+	//UE_LOG(LogTemp, Warning, TEXT("location: %s, dist: %f, tangent: %s"), *location.ToString(), distance, *(-tangent).ToString());
 	AddMovementInput(-tangent, distance);
 }
 
@@ -283,7 +342,16 @@ void AMoyoCharacter::GlideUp()
 
 void AMoyoCharacter::DashDown()
 {
-	
+	// We can only dash while in mid air, and only once per jump
+	if(bDashAvailable && MoyoCharMovementComp->IsFalling())
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Dash initiated"));
+		dashStartTime = GetWorld()->TimeSeconds;
+		dashPrevPos = 0.f;
+		bDashing = true;
+		dashDirection = inputDir;
+		bDashAvailable = false;
+	}
 }
 
 void AMoyoCharacter::DashUp()
