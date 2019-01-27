@@ -28,6 +28,9 @@ AMoyoCharacter::AMoyoCharacter(const FObjectInitializer& ObjectInitializer)
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
+
+	motor = CreateDefaultSubobject<UMoyoMotor>(TEXT("motor"));
+
 	// Create a camera boom attached to the root (capsule)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -66,7 +69,6 @@ void AMoyoCharacter::BeginPlay()
 	
 
 
-	motor = CreateDefaultSubobject<UMoyoMotor>(TEXT("motor"));
 	// Temporary measure to be able to see cursor
 	//FInputModeGameAndUI defaultInputMode;
 	//defaultInputMode.SetHideCursorDuringCapture(false);
@@ -83,15 +85,9 @@ void AMoyoCharacter::BeginPlay()
     // Start to Island 01
     //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
     
-
-    // Island 01
-    //SetCylinder(FVector(0.0f, 0.0f, 0.0f), 1120.0f);
     
     // Island 01 to Island 02
-    //SetLine(FVector(-792.0f, 792.0f, 0.0f), FVector(-4200.0f, -3000.0f, 0.0f));
-    
-    // Island 02
-    //SetCylinder(FVector(-3200.0f, -4000.0f, 0.0f), 1414.0f);
+    //SetLine(FVector(4020.0f, 1120.0f, 0.0f), FVector(-20.0f, 1120.0f, 0.0f));
 }
 
 // Called every frame
@@ -108,7 +104,7 @@ void AMoyoCharacter::Tick(float DeltaTime)
 		return;
 
 	}
-    if(isCylinder) { // --- Cylinder
+    if(motor->isCylinder) { // --- Cylinder
 
 		CameraBoom->SocketOffset = FVector(0.f, 0.f, 200.f);
         // Character Position
@@ -224,7 +220,7 @@ void AMoyoCharacter::MoveRight(float Value)
 {
 	inputDir = Value;
     
-    if(isCylinder) { // --- Cylinder
+    if(motor->isCylinder) { // --- Cylinder
 		MoveRightCylinder(Value);
     
 	}else{ // --- Line
@@ -241,7 +237,7 @@ void AMoyoCharacter::MoveRightCylinder(float Value)
 
 	float angle = speed * Value;
 
-	FVector radius = location - cylinderFocus;
+	FVector radius = location - motor->cylinderFocus;
 	FVector newRadius = radius.RotateAngleAxis(angle, FVector(0.0f, 0.0f, 1.0f));
 
 	FVector tangent = newRadius - radius;
@@ -256,7 +252,7 @@ void AMoyoCharacter::MoveRightCylinder(float Value)
 void AMoyoCharacter::MoveRightLinear(float Value)
 {
 	// add movement in the direction
-	AddMovementInput(-lineDirection, speed * Value);
+	AddMovementInput(-motor->lineDirection, speed * Value);
 }
 
 

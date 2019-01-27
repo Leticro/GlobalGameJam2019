@@ -15,8 +15,9 @@ UMoyoMotor::UMoyoMotor()
 void UMoyoMotor::BeginPlay()
 {
 	Super::BeginPlay();
-	cylinderFocus = FVector(0.0f, 0.0f, 0.0f),
-	cylinderRadius = 1120.0f;
+	isCylinder = true;
+	cylinderFocus = FVector(-3200.0f, -4000.0f, 0.0f),
+	cylinderRadius = 1414.0f;
 
 	// ...
 

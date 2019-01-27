@@ -99,7 +99,6 @@ protected:
 	float slingMag;
 
     // Movement Parameters
-    bool isCylinder;
     float speed;
 		float inputDir;
 	// Hover fields
