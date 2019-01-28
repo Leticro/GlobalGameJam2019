@@ -72,8 +72,8 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Moyo")
         void SendGreeting() { DoGreeting(); }
 
-    UFUNCTION(BlueprintCallable, Category = "Moyo")
-        void SendItem(FName itemID) { if(RemainingItems.Contains(itemID)) { DoRecieve(itemID); } }
+	UFUNCTION(BlueprintCallable, Category = "Moyo")
+		void SendItem(FName itemID);
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
         TArray<FName> RemainingItems;
