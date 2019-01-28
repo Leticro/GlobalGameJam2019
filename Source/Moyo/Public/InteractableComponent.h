@@ -7,7 +7,8 @@
 #include "MoyoCharacter.h"
 #include "InteractableComponent.generated.h"
 
-UCLASS()
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FInteractDelegate, APlayerController*, Controller, AMoyoCharacter*, Character);
+UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class MOYO_API UInteractableComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -25,6 +26,9 @@ public:
 
     UPROPERTY(EditDefaultsOnly)
         FString Action;
+
+    UPROPERTY(BlueprintAssignable, Category = "Interact")
+    FInteractDelegate OnInteractEvent;
 
     UFUNCTION(BlueprintCallable, Category = "Pickup")
         FString GetInteractText() const;

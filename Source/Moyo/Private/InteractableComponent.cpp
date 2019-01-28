@@ -11,6 +11,7 @@ UInteractableComponent::UInteractableComponent()
 
 void UInteractableComponent::Interact_Implementation(APlayerController* Controller, AMoyoCharacter* Character)
 {
+    OnInteractEvent.Broadcast(Controller, Character);
     return;
 }
 

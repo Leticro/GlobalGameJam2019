@@ -52,6 +52,9 @@ public:
 	void DoGreeting();
 	virtual void DoGreeting_Implementation() { return; }
 
+    UFUNCTION(BlueprintNativeEvent)
+        void DoRecieve(FName itemID);
+    virtual void DoRecieve_Implementation(FName itemID) { return; }
 
 	UFUNCTION(BlueprintNativeEvent)
 	void DoDrop();
@@ -66,8 +69,14 @@ public:
 	void DoDeath();
 	virtual void DoDeath_Implementation();
 
+    UFUNCTION(BlueprintCallable, Category = "Moyo")
+        void SendGreeting() { DoGreeting(); }
 
+    UFUNCTION(BlueprintCallable, Category = "Moyo")
+        void SendItem(FName itemID) { if(RemainingItems.Contains(itemID)) { DoRecieve(itemID); } }
 
+    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+        TArray<FName> RemainingItems;
 public:
 
 	/** Called for side to side input */
