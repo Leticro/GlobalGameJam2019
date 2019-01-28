@@ -35,30 +35,24 @@ public:
 	virtual void DoDash_Implementation() { return; }
 
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintImplementableEvent)
 	void DoKeepFloat();
-	virtual void DoKeepFloat_Implementation() { return; }
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintImplementableEvent)
 	void DoKeepWalking();
-	virtual void DoKeepWalking_Implementation() { return; }
 
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintImplementableEvent)
 	void DoPickup();
-	virtual void DoPickup_Implementation() { return; }
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintImplementableEvent)
 	void DoGreeting();
-	virtual void DoGreeting_Implementation() { return; }
 
-    UFUNCTION(BlueprintNativeEvent)
-        void DoRecieve(FName itemID);
-    virtual void DoRecieve_Implementation(FName itemID) { return; }
+    UFUNCTION(BlueprintImplementableEvent)
+    void DoRecieve(FName itemID);
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintImplementableEvent)
 	void DoDrop();
-	virtual void DoDrop_Implementation() { return; }
 
 
 	UFUNCTION(BlueprintNativeEvent)
