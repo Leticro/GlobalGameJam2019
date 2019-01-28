@@ -168,7 +168,8 @@ void AMoyoCharacter::Tick(float DeltaTime)
 
 	DashUpdate(DeltaTime);
 
-    CheckForInteractables();
+	CheckForInteractables();
+	CheckForInteractableComponents();
 }
 
 
@@ -347,17 +348,33 @@ void AMoyoCharacter::CheckForInteractables()
                 IController->CurrentInteractable = Interactable;
                 return;
             }
-            UActorComponent * OtherComponent = CollectedActors[iCollected]->GetComponentByClass(UInteractableComponent::StaticClass());
-            if(OtherComponent)
-            {
-                UInteractableComponent* Other = Cast<UInteractableComponent>(OtherComponent);
-                IController->CurrentInteractableComponent = Other;
-                return;
-            }
         }
     }
     IController->CurrentInteractable = nullptr;
-    IController->CurrentInteractableComponent = nullptr;
+}
+
+
+void AMoyoCharacter::CheckForInteractableComponents()
+{
+	AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
+
+	// Get all overlapping Actors and store them in an array
+	TArray<AActor*> CollectedActors;
+	CollectionSphere->GetOverlappingActors(CollectedActors);
+
+	// For each collected Actor
+	for (int32 iCollected = 0; iCollected < CollectedActors.Num(); ++iCollected)
+	{
+		
+		UActorComponent * OtherComponent = CollectedActors[iCollected]->GetComponentByClass(UInteractableComponent::StaticClass());
+		if (OtherComponent)
+		{
+			UInteractableComponent* Other = Cast<UInteractableComponent>(OtherComponent);
+			IController->CurrentInteractableComponent = Other;
+			return;
+		}
+	}
+	IController->CurrentInteractableComponent = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////

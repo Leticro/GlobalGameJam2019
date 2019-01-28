@@ -74,19 +74,20 @@ void AMoyoPlayerController::SetupInputComponent()
 
 void AMoyoPlayerController::Interact()
 {
-    // inventory full
-    if(Inventory.Num())
-    {
-        // drop object
-        Inventory.Pop();
-        
-    }
-    else if(CurrentInteractable)
-    {
-        CurrentInteractable->Interact(this, CurrentPawn);
-    }
-    else if(CurrentInteractableComponent)
+    
+    if(CurrentInteractableComponent)
     {
         CurrentInteractableComponent->Interact(this, CurrentPawn);
     }
+	// inventory full
+	if (Inventory.Num())
+	{
+		// drop object
+		Inventory.Pop();
+
+	}
+	else if (CurrentInteractable)
+	{
+		CurrentInteractable->Interact(this, CurrentPawn);
+	}
 }

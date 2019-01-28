@@ -66,6 +66,7 @@ protected:
     
     /** Function to check for the closest Interactable in sight and in range. */
     void CheckForInteractables();
+	void CheckForInteractableComponents();
 
 public:
 	// Sling fields
