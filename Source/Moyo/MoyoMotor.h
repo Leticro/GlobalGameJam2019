@@ -76,7 +76,7 @@ public:
 	bool onlyOneSurface;
 
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	bool locked;
 
 
