@@ -37,7 +37,7 @@ AMoyoGuy::AMoyoGuy(const FObjectInitializer& ObjectInitializer)
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f); // ...at this rotation rate
 	GetCharacterMovement()->GravityScale = 2.f;
 	GetCharacterMovement()->AirControl = 0.80f;
-	GetCharacterMovement()->JumpZVelocity = 1000.f;
+	GetCharacterMovement()->JumpZVelocity = 1100.f;
 	GetCharacterMovement()->GroundFriction = 3.f;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
@@ -64,9 +64,6 @@ void AMoyoGuy::BeginPlay()
 void AMoyoGuy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-    // Correct location if outside rails
-	motor->ClampToCylinder();
 
 
 	if (GetActorLocation().Z < -500)
@@ -110,15 +107,31 @@ void AMoyoGuy::MoveRight(float Value)
 
 void AMoyoGuy::MoveRightCylinder(float Value)
 {
-	FVector dir = motor->GetForwardVector(speed*Value);
-	float scalar = motor->GetForwardScalar(speed);
-	AddMovementInput(-dir, scalar);
+	float factor = 0.1f* FMath::Abs(FMath::Sin(FMath::DegreesToRadians(Value / 2.0f)));
+	if (Value > 0)
+	{
+		factor *= -1;
+	}
+	FVector next = UMoyoLib::GetMoveDestination(1.0f, this,factor, motor);
+	FVector delta = next - GetActorLocation();
+	FVector dir;
+	float scalar;
+	delta.ToDirectionAndLength(dir, scalar);
+	AddMovementInput(dir, scalar);
 }
 
 void AMoyoGuy::MoveRightLinear(float Value)
 {
 	// add movement in the direction
 	AddMovementInput(-motor->lineDirection, speed * Value);
+
+	FVector next = UMoyoLib::GetMoveDestination(1.0f, this, speed*Value, motor);
+	FVector delta = next - GetActorLocation();
+	FVector dir;
+	float scalar;
+	delta.ToDirectionAndLength(dir, scalar);
+	AddMovementInput(dir, scalar);
+
 }
 
 
@@ -137,7 +150,7 @@ void AMoyoGuy::DoFallOut_Implementation()
 
 void AMoyoGuy::SendItem(FName itemID)
 {
-	//if (RemainingItems.Contains(itemID)) 
+	if (RemainingItems.Contains(itemID)) 
 	{ 
 		DoRecieve(itemID); 
 	} 

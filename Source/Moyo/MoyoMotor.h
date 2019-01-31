@@ -25,20 +25,20 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveSurface(FMoyoSurface surface);
 
-	UFUNCTION(BlueprintCallable)
-	void ClampToCylinder();
 
-	UFUNCTION(BlueprintCallable)
-	FVector GetForwardVector(float speed);
+	double GetPolarR();
+	double GetPolarPhi();
+	FVector GetCartesian(double R, double Phi);
+	FVector GetLinearVector(float MoveSpeed);
 
-	UFUNCTION(BlueprintPure)
-	float GetForwardScalar(float speed) const;
 
 	UPROPERTY()
 	TArray<FMoyoSurface> stack;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float fixedRadius;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float fixedElevation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EMoyoMotorState motorState;
@@ -48,18 +48,18 @@ public:
 	AActor* ownerActor;
 
 	// Cylinder
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector cylinderFocus;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float cylinderRadius;
 
 	// Line
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector lineStartPoint;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector lineEndPoint;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector lineDirection;
 
 	UPROPERTY(VisibleAnywhere)

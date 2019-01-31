@@ -7,9 +7,23 @@
 
 FVector UMoyoLib::GetMoveDestination(float DeltaTime, AActor* Actor, float MoveSpeed, UMoyoMotor* Motor)
 {
-	Motor->ClampToCylinder();
-	float Scalar = Motor->GetForwardScalar(DeltaTime*MoveSpeed);
-	FVector MoveDelta = Motor->GetForwardVector(MoveSpeed);
-	FVector Last = Actor->GetActorLocation();
-	return Last + MoveDelta*Scalar;
+	if (Motor->motorState == EMoyoMotorState::CYLINDER)
+	{
+		const FVector start = Actor->GetActorLocation();
+		const double PolarR = Motor->GetPolarR();
+		double PolarPhi = Motor->GetPolarPhi();
+		PolarPhi += (double)MoveSpeed*DeltaTime;
+		const FVector result = Motor->GetCartesian(PolarR, PolarPhi);
+		if (MoveSpeed < 0.001f)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Polar %.2f %.2f"), (float)PolarR, (float)PolarPhi);
+		}
+		return result;
+	}
+	else
+	{
+		const FVector start = Actor->GetActorLocation();
+		return start - Motor->GetLinearVector(MoveSpeed)*MoveSpeed;
+	}
+	
 }
