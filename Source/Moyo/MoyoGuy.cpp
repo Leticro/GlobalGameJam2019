@@ -137,9 +137,9 @@ void AMoyoGuy::MoveRightLinear(float Value)
 
 void AMoyoGuy::DoDeath_Implementation()
 {
-	FVector LaunchVector = 99.9f * GetActorLocation();
+	FVector LaunchVector = 3000.0f * GetActorLocation().GetSafeNormal() + FVector::UpVector*2000.0f;
 	LaunchCharacter(LaunchVector, false, false);
-	motor->motorState = EMoyoMotorState::NONE;
+	//motor->motorState = EMoyoMotorState::NONE;
 }
 
 void AMoyoGuy::DoFallOut_Implementation()

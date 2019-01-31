@@ -16,7 +16,7 @@ FVector UMoyoLib::GetMoveDestination(float DeltaTime, AActor* Actor, float MoveS
 		const FVector result = Motor->GetCartesian(PolarR, PolarPhi);
 		if (MoveSpeed < 0.001f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Polar %.2f %.2f"), (float)PolarR, (float)PolarPhi);
+			//UE_LOG(LogTemp, Warning, TEXT("Polar %.2f %.2f"), (float)PolarR, (float)PolarPhi);
 		}
 		return result;
 	}

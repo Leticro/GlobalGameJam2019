@@ -317,7 +317,10 @@ void AMoyoCharacter::DashUpdate(float DeltaTime)
 void AMoyoCharacter::CheckForInteractables()
 {
     AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
-
+	if (!IController)
+	{
+		return;
+	}
     if(IController->Inventory.Num())
     {
         FVector playerLoc = GetActorLocation();
@@ -357,7 +360,10 @@ void AMoyoCharacter::CheckForInteractables()
 void AMoyoCharacter::CheckForInteractableComponents()
 {
 	AMoyoPlayerController* IController = Cast<AMoyoPlayerController>(GetController());
-
+	if (!IController)
+	{
+		return;
+	}
 	// Get all overlapping Actors and store them in an array
 	TArray<AActor*> CollectedActors;
 	CollectionSphere->GetOverlappingActors(CollectedActors);
